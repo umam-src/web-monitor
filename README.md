@@ -7,7 +7,7 @@ Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaa
 ## Fitur yang sudah ada
 
 - Tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
-- Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan.
+- Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan. Target lokal/intranet dapat diizinkan secara eksplisit.
 - Penyimpanan hasil pemeriksaan dan tampilan hingga 20 hasil terbaru per situs.
 - Kueri basis data terparameterisasi, escaping keluaran HTML, dan token CSRF untuk formulir POST.
 - Wizard `setup.php` menguji koneksi MariaDB, membuat tabel secara otomatis, menyimpan konfigurasi, dan membuat administrator pertama.
@@ -15,7 +15,7 @@ Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaa
 - Skema MySQL/MariaDB di `database/schema.sql` dan contoh konfigurasi di `pengaturan.contoh.php`.
 - CI GitHub Actions yang memeriksa sintaks PHP 7.4 dan penerapan skema pada MySQL 8.0.
 
-**Batasan keamanan:** validasi URL saat ini hanya mitigasi SSRF awal. Resolusi DNS belum dikunci ke alamat IP yang sama saat koneksi, sehingga risiko DNS rebinding belum tertutup. Login dasar sudah ada, tetapi belum menggantikan audit keamanan. Jangan mengekspos aplikasi ke internet.
+**Batasan keamanan:** opsi target lokal/intranet memperluas akses yang dapat dilakukan server dan meningkatkan risiko SSRF. Aktifkan hanya jika diperlukan dan batasi aplikasi ke jaringan tepercaya. Validasi URL saat ini hanya mitigasi SSRF awal. Resolusi DNS belum dikunci ke alamat IP yang sama saat koneksi, sehingga risiko DNS rebinding belum tertutup. Login dasar sudah ada, tetapi belum menggantikan audit keamanan. Jangan mengekspos aplikasi ke internet.
 
 ## Persyaratan
 
@@ -39,9 +39,9 @@ Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada DS9
 3. Buka `setup.php` dari browser di perangkat lokal atau jaringan privat.
 4. Masukkan host `127.0.0.1`, nama database yang sudah dibuat, dan kredensial MariaDB yang memiliki hak membuat tabel pada database itu. Tidak perlu membuka phpMyAdmin atau membuat database lagi.
 5. Pilih nama pengguna dan kata sandi administrator Web Monitor (minimal 12 karakter), lalu jalankan instalasi. Wizard menguji koneksi, membuat tabel situs/riwayat/akun, membuat administrator, dan menyimpan konfigurasi.
-6. Setelah berhasil, wizard terkunci karena berkas `pengaturan.php` sudah dibuat. Masuk melalui `index.php`.
+6. Opsional: centang **Izinkan target intranet, hostname lokal, dan IP privat** bila ingin memantau layanan internal. Pilihan ini disimpan di `pengaturan.php`; default-nya nonaktif.\n7. Setelah berhasil, wizard terkunci karena berkas `pengaturan.php` sudah dibuat. Masuk melalui `index.php`.
 
-Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Jika koneksi atau izin folder gagal, wizard berhenti dengan pesan aman; tidak mencoba melewati hak MariaDB. Kredensial yang dimasukkan menjadi kredensial koneksi aplikasi yang disimpan di `pengaturan.php`, jadi gunakan akun database khusus berhak minimum, bukan root.
+Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Jika instalasi sudah selesai, pengaturan `izinkan_alamat_lokal` dapat diubah melalui File Station dengan menyunting `pengaturan.php` dan menetapkan nilainya ke `true` atau `false` (tanpa mengubah kredensial lain). Jika koneksi atau izin folder gagal, wizard berhenti dengan pesan aman; tidak mencoba melewati hak MariaDB. Kredensial yang dimasukkan menjadi kredensial koneksi aplikasi yang disimpan di `pengaturan.php`, jadi gunakan akun database khusus berhak minimum, bukan root.
 
 1. Periksa profil PHP yang dipakai situs, ekstensi wajib, izin direktori, dan koneksi MariaDB.
 2. Uji apakah database dan akun aplikasi yang sudah dibuat melalui phpMyAdmin dapat digunakan oleh Web Monitor.
