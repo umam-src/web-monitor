@@ -25,3 +25,12 @@ CREATE TABLE riwayat_pemeriksaan (
         FOREIGN KEY (situs_id) REFERENCES situs_pantauan(id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE pengguna_aplikasi (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    nama_pengguna VARCHAR(80) NOT NULL,
+    hash_kata_sandi VARCHAR(255) NOT NULL,
+    dibuat_pada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_pengguna_aplikasi_nama (nama_pengguna)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
