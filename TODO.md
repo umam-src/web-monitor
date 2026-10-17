@@ -19,7 +19,8 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Buat kerangka dasbor PHP dan skema basis data awal.
 - [x] Buat contoh pengaturan lokal dan .gitignore.
 - [x] Catat versi DSM target: DSM 7.2.2.
-- [ ] Catat model Synology dan verifikasi paket PHP 7.4 serta ekstensi yang tersedia pada model tersebut.
+- [x] Catat perangkat target: Synology DS923+ dengan DSM 7.2.2.
+- [ ] Verifikasi langsung paket PHP 7.4, Web Station, MariaDB 10, dan ekstensi yang tersedia pada DS923+.
 - [ ] Verifikasi lingkungan server web dan konfigurasi PHP 7.4 pada Synology.
 - [ ] Rancang dan verifikasi wizard pemasangan berbasis GUI; tidak boleh membutuhkan CLI pada sisi pengguna.
 - [ ] Wizard memeriksa prasyarat, menguji kredensial MariaDB, membuat database/tabel dan akun database aplikasi bila kredensial memiliki hak yang diperlukan, lalu menyimpan hanya kredensial aplikasi.
