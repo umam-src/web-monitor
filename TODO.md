@@ -32,7 +32,7 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
 - [x] Tambahkan uji penerapan skema pada MySQL 8.0 di CI.
 
-Kriteria penerimaan: pemasangan dari browser/GUI tanpa CLI, database dan tabel dibuat otomatis dengan hak akses yang jelas, akun administrator pertama dibuat setelah instalasi, wizard terkunci setelah selesai, instalasi dapat diulang dengan aman, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. CI PHP 7.4 dan penerapan skema MySQL 8.0 berhasil pada commit implementasi Fase 1; perubahan lanjutan tetap harus diverifikasi oleh run baru.
+Kriteria penerimaan: pemasangan dari browser/GUI tanpa CLI, tabel dibuat otomatis pada database yang sudah disiapkan dengan hak akses yang jelas, akun administrator pertama dibuat, login diwajibkan, wizard terkunci setelah selesai, instalasi dapat dipulihkan dengan aman jika konfigurasi gagal disimpan, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. CI PHP 7.4 dan penerapan skema MySQL 8.0 berhasil pada commit implementasi Fase 1; perubahan lanjutan tetap harus diverifikasi oleh run baru.
 
 ## Fase 1 — Pengelolaan situs dan pemeriksaan manual (target 0.2.0; belum diterima, menunggu gate Fase 0)
 - [x] Implementasikan tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
@@ -71,8 +71,9 @@ Kriteria penerimaan: status memiliki alasan yang dapat dijelaskan; satu kegagala
 Kriteria penerimaan: pemberitahuan mengikuti aturan status; kegagalan kanal tidak menghentikan pemeriksaan.
 
 ## Fase 5 — Keamanan dan kesiapan penggunaan (target 0.6.0)
-- [ ] Tambahkan autentikasi dan pengelolaan sesi.
+- [x] Tambahkan login/logout administrator dasar dan pengelolaan sesi awal.
 - [x] Terapkan token CSRF untuk formulir POST.
+- [ ] Audit autentikasi: pembatasan percobaan login, kedaluwarsa sesi, dan uji akses tanpa izin.
 - [ ] Cegah pemeriksa mengakses jaringan internal atau alamat khusus secara menyeluruh; validasi semua alamat hasil DNS dan setiap pengalihan.
 - [x] Tetapkan batas waktu pemeriksaan dan matikan pengalihan otomatis.
 - [ ] Batasi ukuran respons dan frekuensi pemeriksaan.
