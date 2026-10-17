@@ -5,6 +5,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 ## [Belum dirilis]
 
 ### Ditambahkan
+- Workflow GitHub Actions untuk membuat tag dan GitHub Release dari bagian versi bertanggal di CHANGELOG.md.
 - Workflow CI pada push ke main dan pemicu manual untuk memeriksa sintaks PHP 7.4 serta penerapan skema pada MySQL 8.0.
 
 ### Diubah
