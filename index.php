@@ -50,7 +50,7 @@ $pdo = null;
 
 if (!is_file($berkasPengaturan)) {
     http_response_code(503);
-    $pesan = 'Pengaturan belum tersedia. Salin pengaturan.contoh.php menjadi pengaturan.php dan sesuaikan koneksi basis data.';
+    $pesan = 'Pengaturan belum tersedia. Jalankan wizard instalasi otomatis melalui setup.php.';
 } else {
     try {
         $pengaturan = require $berkasPengaturan;
@@ -66,7 +66,42 @@ if (!is_file($berkasPengaturan)) {
     }
 }
 
-if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SESSION['pengguna_id'])) {
+    if (!tokenValid()) {
+        http_response_code(400);
+        $pesan = 'Permintaan tidak valid atau sesi kedaluwarsa. Muat ulang halaman.';
+        $jenisPesan = 'error';
+    } elseif (!isset($_POST['aksi']) || $_POST['aksi'] !== 'masuk') {
+        $pesan = 'Silakan masuk terlebih dahulu.';
+        $jenisPesan = 'error';
+    } else {
+        $namaPengguna = trim(isset($_POST['nama_pengguna']) && is_string($_POST['nama_pengguna']) ? $_POST['nama_pengguna'] : '');
+        $kataSandi = isset($_POST['kata_sandi']) && is_string($_POST['kata_sandi']) ? $_POST['kata_sandi'] : '';
+        try {
+            $stmt = $pdo->prepare('SELECT id, nama_pengguna, hash_kata_sandi FROM pengguna_aplikasi WHERE nama_pengguna = ? LIMIT 1');
+            $stmt->execute(array($namaPengguna));
+            $akun = $stmt->fetch();
+            if ($akun && password_verify($kataSandi, $akun['hash_kata_sandi'])) {
+                session_regenerate_id(true);
+                $_SESSION['pengguna_id'] = (int) $akun['id'];
+                $_SESSION['nama_pengguna'] = $akun['nama_pengguna'];
+                $_SESSION['token'] = bin2hex(random_bytes(32));
+                $token = $_SESSION['token'];
+                $pesan = 'Berhasil masuk.';
+                $jenisPesan = 'success';
+            } else {
+                $pesan = 'Nama pengguna atau kata sandi salah.';
+                $jenisPesan = 'error';
+            }
+        } catch (Exception $galat) {
+            $pesan = 'Tabel akun belum tersedia. Jalankan wizard instalasi melalui setup.php.';
+            $jenisPesan = 'error';
+            error_log('Web Monitor: autentikasi gagal karena tabel akun tidak tersedia.');
+        }
+    }
+}
+
+if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_id'])) {
     if (!tokenValid()) {
         http_response_code(400);
         $pesan = 'Permintaan tidak valid atau sesi kedaluwarsa. Muat ulang halaman.';
@@ -75,7 +110,7 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $aksi = isset($_POST['aksi']) && is_string($_POST['aksi']) ? $_POST['aksi'] : '';
         $id = isset($_POST['id']) ? filter_var($_POST['id'], FILTER_VALIDATE_INT, array('options' => array('min_range' => 1))) : false;
         try {
-            if ($aksi === 'simpan') {
+            if ($aksi === 'keluar') {\n                unset($_SESSION['pengguna_id'], $_SESSION['nama_pengguna']);\n                session_regenerate_id(true);\n                $_SESSION['token'] = bin2hex(random_bytes(32));\n                $token = $_SESSION['token'];\n                $pesan = 'Anda sudah keluar.';\n                $jenisPesan = 'success';\n            } elseif ($aksi === 'simpan') {
                 $nama = trim(isset($_POST['nama']) && is_string($_POST['nama']) ? $_POST['nama'] : '');
                 $url = trim(isset($_POST['alamat_url']) && is_string($_POST['alamat_url']) ? $_POST['alamat_url'] : '');
                 $interval = isset($_POST['interval_detik']) ? filter_var($_POST['interval_detik'], FILTER_VALIDATE_INT) : false;
@@ -212,7 +247,9 @@ if ($pdo) {
 <header><h1>Web Monitor</h1><div class="muted">Kelola situs dan jalankan pemeriksaan HTTP/HTTPS manual.</div></header>
 <main>
 <?php if ($pesan !== ''): ?><p class="notice <?php echo aman($jenisPesan); ?>"><?php echo aman($pesan); ?></p><?php endif; ?>
-<?php if ($pdo): ?>
+<?php if ($pdo && !empty($_SESSION['pengguna_id'])): ?>
+<p class="muted">Masuk sebagai <?php echo aman($_SESSION['nama_pengguna']); ?>.
+<form class="inline" method="post"><input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="aksi" value="keluar"><button type="submit">Keluar</button></form></p>
 <section class="panel">
 <h2><?php echo $edit ? 'Ubah situs' : 'Tambah situs'; ?></h2>
 <form method="post" action="index.php">
@@ -256,6 +293,19 @@ if ($pdo) {
 <form class="inline" method="post" onsubmit="return confirm('Hapus situs dan seluruh riwayatnya?');"><input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="id" value="<?php echo aman($baris['id']); ?>"><input type="hidden" name="aksi" value="hapus"><button type="submit">Hapus</button></form></td></tr>
 <?php endforeach; ?>
 </tbody></table><?php endif; ?></section>
+<?php elseif ($pdo): ?>
+<section class="panel">
+<h2>Masuk ke Web Monitor</h2>
+<form method="post" action="index.php" autocomplete="on">
+<input type="hidden" name="token" value="<?php echo aman($token); ?>">
+<input type="hidden" name="aksi" value="masuk">
+<label for="nama_pengguna">Nama pengguna</label><input id="nama_pengguna" name="nama_pengguna" maxlength="80" autocomplete="username" required>
+<label for="kata_sandi">Kata sandi</label><input id="kata_sandi" name="kata_sandi" type="password" autocomplete="current-password" required>
+<p><button type="submit">Masuk</button></p>
+</form>
+</section>
+<?php elseif (!is_file($berkasPengaturan)): ?>
+<p><a class="button" href="setup.php">Mulai instalasi otomatis</a></p>
 <?php endif; ?>
 <p class="muted">Versi awal Fase 1. Autentikasi, pemeriksaan DNS/redirect menyeluruh, penjadwalan otomatis, dan audit keamanan masih diperlukan sebelum penggunaan publik.</p>
 </main></body></html>
