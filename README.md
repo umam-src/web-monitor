@@ -2,18 +2,27 @@
 
 Aplikasi web PHP 7.4 untuk memantau ketersediaan situs melalui HTTP/HTTPS, menyimpan riwayat pemeriksaan, dan membantu mengenali gangguan seperti halaman kesalahan Cloudflare.
 
-Status: fondasi dokumentasi dan roadmap; implementasi aplikasi belum selesai.
+**Status:** kerangka awal dan dokumentasi tersedia; pemeriksa otomatis belum diimplementasikan dan aplikasi belum siap untuk penggunaan publik.
 
-## Cakupan awal
-- Daftar situs yang dipantau.
-- Pemeriksaan berkala dengan batas waktu.
-- Status terakhir, kode HTTP, waktu respons, dan ringkasan kesalahan.
-- Riwayat pemeriksaan dan penjadwalan melalui cron.
+## Yang tersedia
+- Dasbor baca-saja untuk melihat situs dan hasil pemeriksaan terakhir dari basis data.
+- Skema awal basis data pada database/schema.sql.
+- Contoh pengaturan lokal pada pengaturan.contoh.php.
+- Roadmap, catatan perubahan, panduan kontribusi, dan glosarium.
 
 ## Persyaratan awal
-PHP 7.4, PDO, PDO MySQL, cURL, OpenSSL, MySQL/MariaDB, server web, dan cron.
+PHP 7.4, PDO, PDO MySQL, MySQL/MariaDB, server web, dan cron untuk tahap pemeriksaan terjadwal.
 
-Peringatan: PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisolasi untuk pengembangan dan rencanakan peningkatan ke versi yang masih didukung sebelum penggunaan publik.
+Peringatan: PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisolasi untuk pengembangan dan rencanakan peningkatan ke versi yang masih didukung sebelum penggunaan publik. Dasbor belum memiliki autentikasi; jangan publikasikan ke internet.
+
+## Memulai
+1. Buat basis data MySQL/MariaDB bernama web_monitor.
+2. Jalankan database/schema.sql pada basis data tersebut.
+3. Salin pengaturan.contoh.php menjadi pengaturan.php dan isi DSN, nama pengguna, serta rahasia basis data.
+4. Arahkan server web ke direktori proyek hanya di lingkungan pengembangan yang terlindungi.
+5. Pastikan PHP 7.4 dan ekstensi PDO MySQL tersedia.
+
+Kerangka belum diuji pada runtime PHP; petunjuk ini adalah langkah awal dan perlu diverifikasi pada lingkungan sasaran.
 
 ## Dokumen
 - [TODO.md](TODO.md): roadmap dan kriteria selesai.
