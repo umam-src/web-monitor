@@ -1,5 +1,7 @@
 # Roadmap dan TODO
 
+> **Gate fase:** status dan blocker resmi ada di [BLOCKERS.md](BLOCKERS.md). Fase berikutnya dan rilis target tidak boleh dimulai sebelum gate fase sebelumnya diterima.
+
 ## Aturan versi
 Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis hanya dibuat setelah kriteria penerimaan dan pengujian lulus. Perbaikan bug dan keamanan tanpa kemampuan baru menjadi PATCH. Perubahan tidak kompatibel harus didokumentasikan dengan jelas.
 
@@ -12,7 +14,7 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 | 4. Pemberitahuan | 0.5.0 | Pemberitahuan gangguan dan pemulihan |
 | 5. Kesiapan penggunaan | 0.6.0 | Autentikasi, keamanan, pengujian, pencadangan, dan panduan rilis |
 
-## Fase 0 — Fondasi (target 0.1.0)
+## Fase 0 — Fondasi (target 0.1.0; status: TERBLOKIR / BELUM DITERIMA)
 - [x] Buat dokumentasi utama dan glosarium.
 - [x] Buat kerangka dasbor PHP dan skema basis data awal.
 - [x] Buat contoh pengaturan lokal dan .gitignore.
@@ -24,7 +26,7 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 
 Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. CI PHP 7.4 dan penerapan skema MySQL 8.0 berhasil pada commit implementasi Fase 1; perubahan lanjutan tetap harus diverifikasi oleh run baru.
 
-## Fase 1 — Pengelolaan situs dan pemeriksaan manual (target 0.2.0)
+## Fase 1 — Pengelolaan situs dan pemeriksaan manual (target 0.2.0; belum diterima, menunggu gate Fase 0)
 - [x] Implementasikan tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
 - [x] Validasi awal alamat HTTP/HTTPS dan tolak alamat IP privat/lokal yang terdeteksi.
 - [x] Tambahkan pemeriksaan manual dengan batas waktu koneksi 5 detik dan total 15 detik; pengalihan tidak diikuti.
@@ -36,7 +38,7 @@ Kriteria penerimaan: pengguna bisa mengelola situs dari antarmuka; pemeriksaan m
 
 Implementasi Fase 1 belum dianggap siap rilis sampai uji runtime PHP 7.4 pada Synology atau lingkungan setara lulus. Validasi URL merupakan mitigasi SSRF awal, belum menutup DNS rebinding; aplikasi jangan dipublikasikan.
 
-## Fase 2 — Pemantauan terjadwal dan riwayat (target 0.3.0)
+## Fase 2 — Pemantauan terjadwal dan riwayat (target 0.3.0; TERKUNCI sampai gate Fase 1 lulus)
 - [ ] Jalankan pemeriksaan melalui cron dengan interval per situs.
 - [ ] Cegah proses tumpang tindih.
 - [ ] Tampilkan riwayat menurut waktu.
