@@ -369,12 +369,12 @@ if ($pdo) {
 </div>
 </dialog>
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
     var dialog = document.getElementById('dialog-situs');
     var buka = document.getElementById('buka-dialog-situs');
     var tutup = document.getElementById('tutup-dialog-situs');
     var batal = document.getElementById('batal-dialog-situs');
-    if (!dialog || !buka || typeof dialog.showModal !== 'function') return;
+    if (!dialog || !buka || !tutup || !batal || typeof dialog.showModal !== 'function') return;
     function tutupDialog() { dialog.close(); }
     buka.addEventListener('click', function () { dialog.showModal(); });
     tutup.addEventListener('click', tutupDialog);
@@ -383,7 +383,7 @@ if ($pdo) {
         if (event.target === dialog) tutupDialog();
     });
     <?php if ($edit): ?>dialog.showModal();<?php endif; ?>
-})();
+});
 </script>
 <?php if ($riwayatSitus): ?>
 <section class="panel">
