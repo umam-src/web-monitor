@@ -5,22 +5,20 @@
 - Buat perubahan sekecil mungkin yang menyelesaikan masalah.
 - Perbarui README.md, TODO.md, GLOSARIUM.md, dan CHANGELOG.md jika diperlukan.
 - Jangan menyatakan tugas selesai tanpa pengujian yang dapat diulang.
-- Gunakan bahasa Indonesia untuk dokumentasi, antarmuka, komentar, dan nama kode jika praktis; ikuti GLOSARIUM.md.
+- Gunakan bahasa Indonesia dan istilah baku dari GLOSARIUM.md.
 - Jangan menyimpan kata sandi, token, atau data sensitif di repositori maupun log.
 
 ## Lingkungan awal
-- PHP 7.4.
-- PDO, PDO MySQL, cURL, dan OpenSSL.
+- PHP 7.4, PDO, PDO MySQL, cURL, OpenSSL.
 - MySQL atau MariaDB, server web, dan cron.
-
-PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisolasi dan rencanakan peningkatan ke versi PHP yang masih didukung.
+- PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisolasi dan rencanakan peningkatan ke versi yang masih didukung.
 
 ## Alur kerja
 1. Baca README.md, TODO.md, GLOSARIUM.md, dan CHANGELOG.md.
 2. Tentukan masalah dan kriteria penerimaan sebelum mengubah kode.
-3. Jalankan php -l pada berkas PHP yang berubah dan pengujian terkait.
+3. Jalankan pemeriksaan sintaks PHP dan pengujian terkait.
 4. Tambahkan atau perbarui pengujian untuk perilaku yang berubah.
-5. Periksa validasi alamat, pengalihan HTTP, kueri basis data, keluaran HTML, sesi, dan penanganan kesalahan.
+5. Tinjau validasi alamat, pengalihan HTTP, kueri basis data, keluaran HTML, sesi, dan penanganan kesalahan.
 6. Catat hasil pengujian serta hal yang belum diverifikasi.
 
 ## Penamaan
@@ -32,5 +30,9 @@ PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisol
 ## Keamanan pemantauan
 Pemeriksa situs berisiko disalahgunakan untuk mengakses jaringan internal. Batasi protokol ke HTTP/HTTPS, validasi alamat, blokir tujuan privat/loopback/link-local, validasi ulang setelah DNS dan pengalihan, batasi waktu dan ukuran respons, serta jangan mencatat isi respons mentah atau rahasia.
 
-## Versi
-Gunakan Semantic Versioning: MAJOR untuk perubahan tidak kompatibel, MINOR untuk kemampuan baru yang kompatibel, dan PATCH untuk perbaikan atau perubahan keamanan. Catat perubahan di CHANGELOG.md dengan format Keep a Changelog.
+## Versi dan fase roadmap
+- Setiap fase roadmap yang selesai dan menambah kemampuan kompatibel menghasilkan rilis MINOR tersendiri. Fase 0 sampai 5 menargetkan 0.1.0 sampai 0.6.0; lihat TODO.md untuk kriteria penerimaan.
+- Jangan merilis versi target hanya karena pekerjaan dimulai. Semua kriteria penerimaan fase harus lulus, pengujian harus diverifikasi, dan CHANGELOG.md harus diperbarui.
+- PATCH untuk perbaikan bug atau keamanan tanpa menyelesaikan fase/menambah kemampuan utama.
+- MAJOR untuk perubahan tidak kompatibel terhadap kontrak atau konfigurasi yang dirilis. Sebelum 1.0.0, jelaskan dampak perubahan dengan jelas.
+- Gunakan Keep a Changelog dan Semantic Versioning.
