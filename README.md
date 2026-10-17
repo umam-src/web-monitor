@@ -26,7 +26,7 @@ Pertahankan PHP 7.4 selama Synology target masih mendukungnya. PHP 7.4 sudah tid
 
 ## Target pemasangan: Synology DSM 7.2.2
 
-Target penggunaan adalah pemasangan dan konfigurasi **tanpa CLI pada sisi pengguna**. Semua langkah harus dapat dilakukan melalui Package Center, Web Station, File Station/SMB, dan browser; tidak memerlukan SSH atau terminal.
+Target perangkat: **Synology DS923+ dengan DSM 7.2.2**. Target penggunaan adalah pemasangan dan konfigurasi **tanpa CLI pada sisi pengguna**. Semua langkah harus dapat dilakukan melalui Package Center, Web Station, File Station/SMB, dan browser; tidak memerlukan SSH atau terminal.
 
 Dokumentasi resmi Synology untuk DSM 7.2 mencantumkan PHP 7.4 sebagai backend Web Station yang didukung dan menjelaskan pengaturan ekstensi lewat GUI. Ketersediaan aktual tetap perlu diperiksa pada model NAS yang digunakan. [Spesifikasi Web Station DSM 7.2](https://www.synology.com/en-au/dsm/7.2/software_spec/web_station) · [Pengaturan profil PHP](https://kb.synology.com/en-global/DSM/help/WebStation/application_webserv_php).
 
