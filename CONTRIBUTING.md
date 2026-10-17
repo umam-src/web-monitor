@@ -14,6 +14,10 @@
 - PHP 7.4 sudah tidak mendapat dukungan keamanan resmi upstream. Mitigasi risiko dengan membatasi akses aplikasi, menjaga dependensi tetap diperbarui sejauh kompatibel, dan melakukan pengujian keamanan. Jangan mengekspos aplikasi ke internet sebelum kontrol keamanan wajib selesai.
 - Jika Synology target tidak lagi mendukung PHP 7.4, buat rencana migrasi terpisah berdasarkan versi PHP yang didukung saat itu; uji kode, ekstensi, dan dependensi sebelum mengubah persyaratan.
 
+## Alur Git
+
+Web Monitor adalah proyek kecil yang dikerjakan langsung pada `main`. Jangan membuat branch atau pull request untuk perubahan proyek ini. Setelah commit, baca ulang berkas yang berubah dan jalankan pemeriksaan serta pengujian yang sesuai. Jangan menyatakan pekerjaan selesai jika hasil verifikasi belum tersedia.
+
 ## Alur kerja
 1. Baca README.md, TODO.md, GLOSARIUM.md, dan CHANGELOG.md.
 2. Tentukan masalah dan kriteria penerimaan sebelum mengubah kode.
