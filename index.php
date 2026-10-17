@@ -58,6 +58,21 @@ function urlTargetValid($url, $izinkanLokal = false)
     return $ip !== $host && (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
 }
 
+function ikon($nama)
+{
+    $jalur = array(
+        'riwayat' => '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
+        'ubah' => '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>',
+        'status' => '<path d="M12 2v10"></path><path d="M5.6 5.6a8.5 8.5 0 1 0 12.8 0"></path>',
+        'periksa' => '<path d="M20 7v5h-5"></path><path d="M20 12a8 8 0 1 1-2.3-5.7L20 9"></path>',
+        'hapus' => '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="m19 6-1 14H6L5 6"></path><path d="M10 11v5M14 11v5"></path>',
+    );
+    if (!isset($jalur[$nama])) {
+        return '';
+    }
+    return '<svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' . $jalur[$nama] . '</svg>';
+}
+
 function tokenValid()
 {
     return isset($_POST['token'], $_SESSION['token']) &&
