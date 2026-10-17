@@ -2,7 +2,7 @@
 
 Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaan manual, dan menyimpan riwayat pemeriksaan.
 
-**Status:** sebagian fungsi Fase 1 sudah diimplementasikan, tetapi Fase 0 belum diterima. Belum siap untuk penggunaan publik: belum ada autentikasi, mitigasi SSRF/DNS rebinding belum lengkap, dan pengujian runtime pada Synology belum dilakukan.
+**Status:** wizard setup browser dan login administrator awal sudah diimplementasikan di `main`; Fase 0 belum diterima sampai CI, runtime Synology, dan audit keamanan diverifikasi. Belum siap untuk penggunaan publik karena mitigasi SSRF/DNS rebinding belum lengkap.
 
 ## Fitur yang sudah ada
 
@@ -10,10 +10,12 @@ Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaa
 - Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan.
 - Penyimpanan hasil pemeriksaan dan tampilan hingga 20 hasil terbaru per situs.
 - Kueri basis data terparameterisasi, escaping keluaran HTML, dan token CSRF untuk formulir POST.
+- Wizard `setup.php` menguji koneksi MariaDB, membuat tabel secara otomatis, menyimpan konfigurasi, dan membuat administrator pertama.
+- Login administrator dengan hash kata sandi; dashboard dan tindakan memerlukan sesi login.
 - Skema MySQL/MariaDB di `database/schema.sql` dan contoh konfigurasi di `pengaturan.contoh.php`.
 - CI GitHub Actions yang memeriksa sintaks PHP 7.4 dan penerapan skema pada MySQL 8.0.
 
-**Batasan keamanan:** validasi URL saat ini hanya mitigasi SSRF awal. Resolusi DNS belum dikunci ke alamat IP yang sama saat koneksi, sehingga risiko DNS rebinding belum tertutup. Dasbor tidak memiliki autentikasi. Jangan mengekspos aplikasi ke internet.
+**Batasan keamanan:** validasi URL saat ini hanya mitigasi SSRF awal. Resolusi DNS belum dikunci ke alamat IP yang sama saat koneksi, sehingga risiko DNS rebinding belum tertutup. Login dasar sudah ada, tetapi belum menggantikan audit keamanan. Jangan mengekspos aplikasi ke internet.
 
 ## Persyaratan
 
