@@ -42,7 +42,7 @@ Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada DS9
 6. Setelah masuk, saat menambahkan atau mengubah situs, centang **Situs lokal** hanya untuk target intranet/hostname lokal. Situs publik biarkan tidak dicentang.
 7. Setelah berhasil, wizard terkunci karena berkas `pengaturan.php` sudah dibuat. Masuk melalui `index.php`.
 
-Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Jika instalasi sudah selesai, pengaturan `izinkan_alamat_lokal` dapat diubah melalui File Station dengan menyunting `pengaturan.php` dan menetapkan nilainya ke `true` atau `false` (tanpa mengubah kredensial lain). Jika koneksi atau izin folder gagal, wizard berhenti dengan pesan aman; tidak mencoba melewati hak MariaDB. Kredensial yang dimasukkan menjadi kredensial koneksi aplikasi yang disimpan di `pengaturan.php`, jadi gunakan akun database khusus berhak minimum, bukan root.
+Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Pilihan target intranet diatur per situs melalui checkbox `Situs lokal` pada formulir tambah/ubah, bukan melalui pengaturan global instalasi. Jika koneksi atau izin folder gagal, wizard berhenti dengan pesan aman; tidak mencoba melewati hak MariaDB. Kredensial yang dimasukkan menjadi kredensial koneksi aplikasi yang disimpan di `pengaturan.php`, jadi gunakan akun database khusus berhak minimum, bukan root.
 
 1. Periksa profil PHP yang dipakai situs, ekstensi wajib, izin direktori, dan koneksi MariaDB.
 2. Uji apakah database dan akun aplikasi yang sudah dibuat melalui phpMyAdmin dapat digunakan oleh Web Monitor.
