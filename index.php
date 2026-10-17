@@ -54,8 +54,76 @@ function urlTargetValid($url, $izinkanLokal = false)
         strpos($host, '.') === false || preg_match('/\\.local$/i', $host)) {
         return false;
     }
-    $ip = gethostbyname($host);
-    return $ip !== $host && (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    // Domain boleh disimpan walau DNS sedang gagal agar gangguannya dapat dipantau.
+    // DNS publik dan validasi alamat dilakukan ulang saat pemeriksaan.
+    return true;
+}
+
+/**
+ * Mengambil alamat IPv4 dari DNS-over-HTTPS Cloudflare.
+ * Hanya menerima jawaban publik agar mode publik tidak dapat diarahkan ke jaringan privat.
+ */
+function alamatPublikDariDns($host)
+{
+    if (!function_exists('curl_init')) {
+        throw new RuntimeException('Ekstensi cURL diperlukan untuk melakukan resolusi DNS publik.');
+    }
+    $urlDns = 'https://cloudflare-dns.com/dns-query?name=' . rawurlencode($host) . '&type=A';
+    $chDns = curl_init($urlDns);
+    curl_setopt_array($chDns, array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER => false,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 8,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_HTTPHEADER => array('accept: application/dns-json'),
+        CURLOPT_USERAGENT => 'WebMonitor/0.2',
+    ));
+    $isiDns = curl_exec($chDns);
+    $kodeDns = (int) curl_getinfo($chDns, CURLINFO_HTTP_CODE);
+    $galatDns = curl_errno($chDns) ? curl_error($chDns) : '';
+    curl_close($chDns);
+    if ($isiDns === false || $kodeDns !== 200) {
+        throw new RuntimeException($galatDns !== '' ? 'DNS publik gagal: ' . $galatDns : 'DNS publik tidak memberikan respons yang valid.');
+    }
+    $dataDns = json_decode($isiDns, true);
+    if (!is_array($dataDns) || !isset($dataDns['Status']) || (int) $dataDns['Status'] !== 0 ||
+        empty($dataDns['Answer']) || !is_array($dataDns['Answer'])) {
+        throw new RuntimeException('Nama domain tidak memiliki jawaban DNS A publik.');
+    }
+    $alamatPublik = array();
+    foreach ($dataDns['Answer'] as $jawaban) {
+        if (!isset($jawaban['type'], $jawaban['data']) || (int) $jawaban['type'] !== 1) {
+            continue;
+        }
+        $ip = trim((string) $jawaban['data']);
+        if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ||
+            !filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+            throw new RuntimeException('DNS publik mengembalikan alamat nonpublik; pemeriksaan diblokir demi keamanan.');
+        }
+        $alamatPublik[] = $ip;
+    }
+    if (!$alamatPublik) {
+        throw new RuntimeException('DNS publik tidak memberikan alamat IPv4 yang dapat diperiksa.');
+    }
+    return $alamatPublik[0];
+}
+
+/**
+ * Menyiapkan opsi cURL untuk memaksa koneksi ke IP yang sudah divalidasi.
+ * Host URL tetap dipakai sehingga Host header, TLS SNI, dan verifikasi sertifikat tetap benar.
+ */
+function opsiDnsPublik($url)
+{
+    $bagian = parse_url($url);
+    $host = isset($bagian['host']) ? trim($bagian['host'], '[]') : '';
+    if ($host === '' || filter_var($host, FILTER_VALIDATE_IP)) {
+        return array();
+    }
+    $port = isset($bagian['port']) ? (int) $bagian['port'] : (strtolower($bagian['scheme']) === 'https' ? 443 : 80);
+    $ip = alamatPublikDariDns($host);
+    return array(CURLOPT_RESOLVE => array(strtolower($host) . ':' . $port . ':' . $ip));
 }
 
 function ikon($nama)
@@ -221,7 +289,7 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                         }
                         $mulai = microtime(true);
                         $ch = curl_init($target['alamat_url']);
-                        curl_setopt_array($ch, array(
+                        $opsiCurl = array(
                             CURLOPT_RETURNTRANSFER => true,
                             CURLOPT_HEADER => false,
                             CURLOPT_NOBODY => true,
@@ -231,7 +299,11 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                             CURLOPT_SSL_VERIFYPEER => true,
                             CURLOPT_SSL_VERIFYHOST => 2,
                             CURLOPT_USERAGENT => 'WebMonitor/0.2',
-                        ));
+                        );
+                        if (empty($target['situs_lokal'])) {
+                            $opsiCurl = $opsiCurl + opsiDnsPublik($target['alamat_url']);
+                        }
+                        curl_setopt_array($ch, $opsiCurl);
                         curl_exec($ch);
                         $kode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
                         $durasi = (int) round((microtime(true) - $mulai) * 1000);
@@ -272,7 +344,7 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                 }
                 $mulai = microtime(true);
                 $ch = curl_init($target['alamat_url']);
-                curl_setopt_array($ch, array(
+                $opsiCurl = array(
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_HEADER => false,
                     CURLOPT_NOBODY => true,
@@ -282,7 +354,11 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                     CURLOPT_SSL_VERIFYPEER => true,
                     CURLOPT_SSL_VERIFYHOST => 2,
                     CURLOPT_USERAGENT => 'WebMonitor/0.2',
-                ));
+                );
+                if (empty($target['situs_lokal'])) {
+                    $opsiCurl = $opsiCurl + opsiDnsPublik($target['alamat_url']);
+                }
+                curl_setopt_array($ch, $opsiCurl);
                 curl_exec($ch);
                 $kode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $durasi = (int) round((microtime(true) - $mulai) * 1000);
