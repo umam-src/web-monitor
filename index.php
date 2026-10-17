@@ -116,7 +116,14 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
         $aksi = isset($_POST['aksi']) && is_string($_POST['aksi']) ? $_POST['aksi'] : '';
         $id = isset($_POST['id']) ? filter_var($_POST['id'], FILTER_VALIDATE_INT, array('options' => array('min_range' => 1))) : false;
         try {
-            if ($aksi === 'keluar') {\n                unset($_SESSION['pengguna_id'], $_SESSION['nama_pengguna']);\n                session_regenerate_id(true);\n                $_SESSION['token'] = bin2hex(random_bytes(32));\n                $token = $_SESSION['token'];\n                $pesan = 'Anda sudah keluar.';\n                $jenisPesan = 'success';\n            } elseif ($aksi === 'simpan') {
+            if ($aksi === 'keluar') {
+                unset($_SESSION['pengguna_id'], $_SESSION['nama_pengguna']);
+                session_regenerate_id(true);
+                $_SESSION['token'] = bin2hex(random_bytes(32));
+                $token = $_SESSION['token'];
+                $pesan = 'Anda sudah keluar.';
+                $jenisPesan = 'success';
+            } elseif ($aksi === 'simpan') {
                 $nama = trim(isset($_POST['nama']) && is_string($_POST['nama']) ? $_POST['nama'] : '');
                 $url = trim(isset($_POST['alamat_url']) && is_string($_POST['alamat_url']) ? $_POST['alamat_url'] : '');
                 $interval = isset($_POST['interval_detik']) ? filter_var($_POST['interval_detik'], FILTER_VALIDATE_INT) : false;
