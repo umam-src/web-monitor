@@ -36,6 +36,7 @@ jobs:
       - name: Periksa sintaks PHP
         run: |
           php -l index.php
+          php -l setup.php
           php -l pengaturan.contoh.php
 
       - name: Uji penerapan skema basis data
