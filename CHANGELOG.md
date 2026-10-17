@@ -4,6 +4,10 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 
 ## [Belum dirilis]
 
+### Direncanakan
+- Rancangan wizard instalasi berbasis GUI untuk Synology DSM 7.2.2 tanpa CLI pada sisi pengguna.
+- Pembuatan database dan akun database khusus aplikasi menggunakan kredensial MariaDB berizin, lalu pembuatan administrator aplikasi pertama melalui browser.
+
 ### Ditambahkan
 - Tampilan riwayat hingga 20 pemeriksaan terbaru per situs, diakses dari daftar situs.
 - Workflow GitHub Actions untuk membuat tag dan GitHub Release dari bagian versi bertanggal di CHANGELOG.md.
