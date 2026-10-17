@@ -1,5 +1,11 @@
 <?php
 // Web Monitor PHP 7.4. Jangan publikasikan sebelum autentikasi dan audit keamanan tersedia.
+ini_set('session.use_strict_mode', '1');
+session_set_cookie_params(array(
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+));
 session_start();
 
 function aman($nilai)
