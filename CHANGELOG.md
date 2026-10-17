@@ -5,6 +5,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 ## [Belum dirilis]
 
 ### Ditambahkan
+- Tampilan riwayat hingga 20 pemeriksaan terbaru per situs, diakses dari daftar situs.
 - Workflow GitHub Actions untuk membuat tag dan GitHub Release dari bagian versi bertanggal di CHANGELOG.md.
 - Workflow CI pada push ke main dan pemicu manual untuk memeriksa sintaks PHP 7.4 serta penerapan skema pada MySQL 8.0.
 
@@ -16,4 +17,4 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 - Dasbor belum memiliki autentikasi; jangan dipublikasikan ke internet.
 - PHP 7.4 tidak lagi mendapat dukungan keamanan resmi upstream; mitigasi risiko tetap diperlukan.
 
-Belum ada rilis resmi dan kerangka belum diuji pada runtime PHP.
+Belum ada rilis resmi; runtime PHP 7.4 pada Synology belum diuji.
