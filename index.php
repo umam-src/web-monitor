@@ -278,7 +278,7 @@ if ($pdo) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Web Monitor</title>
 <style>
-:root{font-family:system-ui,sans-serif;color:#20252b;background:#f4f6f8}body{margin:0}header{background:#fff;border-bottom:1px solid #dfe3e8;padding:1.2rem max(1rem,calc((100% - 1100px)/2))}main{max-width:1100px;margin:2rem auto;padding:0 1rem}h1{margin:0;font-size:1.4rem}.muted{color:#5c6672;font-size:.9rem}.panel{background:#fff;border:1px solid #dfe3e8;border-radius:.7rem;padding:1rem;margin-bottom:1rem;overflow-x:auto}.notice{padding:.9rem 1rem;border-radius:.5rem;background:#fff7e6;border:1px solid #f0d69a}.success{background:#e4f7e9;border-color:#a6dfb5}.error{background:#fee2e2;border-color:#f3aaaa}table{width:100%;border-collapse:collapse;min-width:780px}th,td{text-align:left;padding:.7rem .55rem;border-bottom:1px solid #e8ebef;vertical-align:top}th{font-size:.85rem;color:#4a5561}.status{display:inline-block;border-radius:1rem;padding:.2rem .6rem;background:#edf0f3}.aktif{background:#dff5e6;color:#14532d}.gangguan{background:#fee2e2;color:#991b1b}label{display:block;margin:.7rem 0 .25rem}input{box-sizing:border-box;width:100%;max-width:650px;padding:.6rem;border:1px solid #b8c1cb;border-radius:.35rem}button,.button{display:inline-block;padding:.5rem .7rem;border:1px solid #b8c1cb;border-radius:.35rem;background:#fff;color:#175cd3;text-decoration:none;cursor:pointer;font:inherit}form.inline{display:inline}form.inline button{margin:.1rem}.actions{white-space:nowrap}a{color:#175cd3;overflow-wrap:anywhere}
+:root{font-family:system-ui,sans-serif;color:#20252b;background:#f4f6f8}body{margin:0}header{background:#fff;border-bottom:1px solid #dfe3e8;padding:1.2rem max(1rem,calc((100% - 1100px)/2))}main{max-width:1100px;margin:2rem auto;padding:0 1rem}h1{margin:0;font-size:1.4rem}.muted{color:#5c6672;font-size:.9rem}.panel{background:#fff;border:1px solid #dfe3e8;border-radius:.7rem;padding:1rem;margin-bottom:1rem;overflow-x:auto}.notice{padding:.9rem 1rem;border-radius:.5rem;background:#fff7e6;border:1px solid #f0d69a}.success{background:#e4f7e9;border-color:#a6dfb5}.error{background:#fee2e2;border-color:#f3aaaa}table{width:100%;border-collapse:collapse;min-width:780px}th,td{text-align:left;padding:.7rem .55rem;border-bottom:1px solid #e8ebef;vertical-align:top}th{font-size:.85rem;color:#4a5561}.status{display:inline-block;border-radius:1rem;padding:.2rem .6rem;background:#edf0f3}.aktif{background:#dff5e6;color:#14532d}.gangguan{background:#fee2e2;color:#991b1b}label{display:block;margin:.7rem 0 .25rem}input{box-sizing:border-box;width:100%;max-width:100%;padding:.6rem;border:1px solid #b8c1cb;border-radius:.35rem}button,.button{display:inline-block;padding:.5rem .7rem;border:1px solid #b8c1cb;border-radius:.35rem;background:#fff;color:#175cd3;text-decoration:none;cursor:pointer;font:inherit}form.inline{display:inline}form.inline button{margin:.1rem}.actions{white-space:nowrap}a{color:#175cd3;overflow-wrap:anywhere}.dialog-situs{box-sizing:border-box;width:min(560px,calc(100vw - 2rem));min-width:min(300px,calc(100vw - 2rem));max-width:560px;height:min(560px,calc(100dvh - 2rem));min-height:min(320px,calc(100dvh - 2rem));max-height:calc(100dvh - 2rem);padding:0;border:1px solid #cbd2da;border-radius:.8rem;box-shadow:0 20px 60px #0003;overflow:hidden}.dialog-situs::backdrop{background:#17212b80}.dialog-layout{display:flex;flex-direction:column;height:100%;min-height:0}.dialog-head,.dialog-foot{flex:none;padding:1rem 1.2rem;background:#fff}.dialog-head{border-bottom:1px solid #e8ebef}.dialog-head h2{margin:0}.dialog-body{padding:.25rem 1.2rem 1rem;overflow:auto;flex:1;min-height:0}.dialog-foot{border-top:1px solid #e8ebef;display:flex;gap:.5rem;justify-content:flex-end;align-items:center}.dialog-head-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}.dialog-close{font-size:1.2rem;color:#20252b;padding:.25rem .55rem}.field-help{margin:.6rem 0 0}@media(max-width:480px){.dialog-situs{width:calc(100vw - 1rem);min-width:0;height:calc(100dvh - 1rem);min-height:0;max-height:calc(100dvh - 1rem);border-radius:.6rem}.dialog-head,.dialog-foot{padding:.8rem}.dialog-body{padding:.2rem .8rem .8rem}}
 </style>
 </head>
 <body>
@@ -288,18 +288,40 @@ if ($pdo) {
 <?php if ($pdo && !empty($_SESSION['pengguna_id'])): ?>
 <p class="muted">Masuk sebagai <?php echo aman($_SESSION['nama_pengguna']); ?>.
 <form class="inline" method="post"><input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="aksi" value="keluar"><button type="submit">Keluar</button></form></p>
-<section class="panel">
-<h2><?php echo $edit ? 'Ubah situs' : 'Tambah situs'; ?></h2>
-<form method="post" action="index.php">
+<p><button type="button" id="buka-dialog-situs"><?php echo $edit ? 'Lanjutkan ubah situs' : 'Tambah situs'; ?></button></p>
+<dialog id="dialog-situs" class="dialog-situs" aria-labelledby="judul-dialog-situs">
+<div class="dialog-layout">
+<div class="dialog-head"><div class="dialog-head-row"><h2 id="judul-dialog-situs"><?php echo $edit ? 'Ubah situs' : 'Tambah situs'; ?></h2><button type="button" class="dialog-close" id="tutup-dialog-situs" aria-label="Tutup dialog">×</button></div></div>
+<form method="post" action="index.php" class="dialog-layout">
+<div class="dialog-body">
 <input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="aksi" value="simpan">
 <?php if ($edit): ?><input type="hidden" name="id" value="<?php echo aman($edit['id']); ?>"><?php endif; ?>
 <label for="nama">Nama situs</label><input id="nama" name="nama" maxlength="150" required value="<?php echo aman($edit ? $edit['nama'] : ''); ?>">
 <label for="alamat_url">Alamat URL</label><input id="alamat_url" name="alamat_url" type="url" maxlength="2048" placeholder="https://contoh.com" required value="<?php echo aman($edit ? $edit['alamat_url'] : ''); ?>">
 <label for="interval_detik">Interval pemeriksaan (detik, minimal 60)</label><input id="interval_detik" name="interval_detik" type="number" min="60" max="86400" required value="<?php echo aman($edit ? $edit['interval_detik'] : 300); ?>">
-<p><button type="submit">Simpan situs</button> <?php if ($edit): ?><a class="button" href="index.php">Batal</a><?php endif; ?></p>
+<p class="muted field-help">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Target privat/lokal mengikuti pengaturan izinkan_alamat_lokal di pengaturan.php (default: nonaktif). Mengaktifkannya meningkatkan risiko SSRF; batasi akses dashboard ke jaringan tepercaya dan jangan publikasikan sebelum audit keamanan selesai.</p>
+</div>
+<div class="dialog-foot"><button type="button" id="batal-dialog-situs">Batal</button><button type="submit">Simpan situs</button></div>
 </form>
-<p class="muted">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Target privat/lokal mengikuti pengaturan izinkan_alamat_lokal di pengaturan.php (default: nonaktif). Mengaktifkannya meningkatkan risiko SSRF; batasi akses dashboard ke jaringan tepercaya dan jangan publikasikan sebelum audit keamanan selesai.</p>
-</section>
+</div>
+</dialog>
+<script>
+(function () {
+    var dialog = document.getElementById('dialog-situs');
+    var buka = document.getElementById('buka-dialog-situs');
+    var tutup = document.getElementById('tutup-dialog-situs');
+    var batal = document.getElementById('batal-dialog-situs');
+    if (!dialog || !buka || typeof dialog.showModal !== 'function') return;
+    function tutupDialog() { dialog.close(); }
+    buka.addEventListener('click', function () { dialog.showModal(); });
+    tutup.addEventListener('click', tutupDialog);
+    batal.addEventListener('click', tutupDialog);
+    dialog.addEventListener('click', function (event) {
+        if (event.target === dialog) tutupDialog();
+    });
+    <?php if ($edit): ?>dialog.showModal();<?php endif; ?>
+})();
+</script>
 <?php if ($riwayatSitus): ?>
 <section class="panel">
 <h2>Riwayat pemeriksaan: <?php echo aman($riwayatSitus['nama']); ?></h2>
