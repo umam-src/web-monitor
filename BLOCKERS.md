@@ -25,7 +25,7 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 
 **Bukti yang tersedia:** CI pada commit `6de7075` berhasil. Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang serta database sudah diatur melalui phpMyAdmin pada `127.0.0.1`. Ini belum membuktikan ekstensi PHP aktif atau Web Monitor berhasil tersambung ke database.
 
-**Gate Fase 0 terbuka jika:** semua kotak di atas ditutup dengan bukti yang dapat diperiksa, wizard instalasi GUI tanpa CLI berhasil membuat database dan akun pertama dengan hak minimum, panduan instalasi berhasil diikuti, dan hasil dicatat di log kerja. Setelah itu Fase 0 dapat diterima dan rilis 0.1.0 boleh dipertimbangkan.
+**Gate Fase 0 terbuka jika:** semua kotak di atas ditutup dengan bukti yang dapat diperiksa, wizard instalasi GUI tanpa CLI berhasil membuat tabel pada database yang sudah disiapkan, membuat akun pertama, dan mengunci setup, panduan instalasi berhasil diikuti, dan hasil dicatat di log kerja. Setelah itu Fase 0 dapat diterima dan rilis 0.1.0 boleh dipertimbangkan.
 
 ## Perilaku installer DSM 7.2.2 yang perlu diverifikasi
 
