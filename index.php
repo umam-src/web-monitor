@@ -110,6 +110,18 @@ if (!is_file($berkasPengaturan)) {
     }
 }
 
+if ($pdo) {
+    // Migrasi otomatis untuk instalasi yang sudah ada; nilai bawaan adalah situs publik.
+    try {
+        $kolomLokal = $pdo->query("SHOW COLUMNS FROM situs_pantauan LIKE 'situs_lokal'")->fetch();
+        if (!$kolomLokal) {
+            $pdo->exec('ALTER TABLE situs_pantauan ADD COLUMN situs_lokal TINYINT(1) NOT NULL DEFAULT 0 AFTER alamat_url');
+        }
+    } catch (Exception $galatMigrasi) {
+        error_log('Web Monitor: migrasi kolom situs_lokal gagal: ' . $galatMigrasi->getMessage());
+    }
+}
+
 if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SESSION['pengguna_id'])) {
     if (!tokenValid()) {
         http_response_code(400);
@@ -168,20 +180,20 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                 if ($nama === '' || strlen($nama) > 150) {
                     throw new InvalidArgumentException('Nama wajib diisi dan maksimal 150 karakter.');
                 }
-                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;
-                if (!urlTargetValid($url, $izinkanLokal)) {
-                    throw new InvalidArgumentException('Alamat harus berupa URL HTTP/HTTPS valid. Target privat/lokal hanya diizinkan jika pengaturan izinkan_alamat_lokal aktif.');
+                $situsLokal = isset($_POST['situs_lokal']) && $_POST['situs_lokal'] === '1';
+                if (!urlTargetValid($url, $situsLokal)) {
+                    throw new InvalidArgumentException('Alamat harus berupa URL HTTP/HTTPS valid. Untuk hostname lokal atau IP privat, centang Situs lokal.');
                 }
                 if ($interval === false || $interval < 60 || $interval > 86400) {
                     throw new InvalidArgumentException('Interval harus antara 60 dan 86400 detik.');
                 }
                 if ($id) {
-                    $stmt = $pdo->prepare('UPDATE situs_pantauan SET nama = ?, alamat_url = ?, interval_detik = ? WHERE id = ?');
-                    $stmt->execute(array($nama, $url, $interval, $id));
+                    $stmt = $pdo->prepare('UPDATE situs_pantauan SET nama = ?, alamat_url = ?, situs_lokal = ?, interval_detik = ? WHERE id = ?');
+                    $stmt->execute(array($nama, $url, $situsLokal ? 1 : 0, $interval, $id));
                     $pesan = 'Situs berhasil diperbarui.';
                 } else {
-                    $stmt = $pdo->prepare('INSERT INTO situs_pantauan (nama, alamat_url, interval_detik) VALUES (?, ?, ?)');
-                    $stmt->execute(array($nama, $url, $interval));
+                    $stmt = $pdo->prepare('INSERT INTO situs_pantauan (nama, alamat_url, situs_lokal, interval_detik) VALUES (?, ?, ?, ?)');
+                    $stmt->execute(array($nama, $url, $situsLokal ? 1 : 0, $interval));
                     $pesan = 'Situs berhasil ditambahkan.';
                 }
                 $jenisPesan = 'success';
@@ -199,13 +211,12 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                 if (!function_exists('curl_init')) {
                     throw new RuntimeException('Ekstensi cURL PHP belum tersedia.');
                 }
-                $targetAktif = $pdo->query('SELECT id, alamat_url FROM situs_pantauan WHERE aktif = 1 ORDER BY id ASC')->fetchAll();
+                $targetAktif = $pdo->query('SELECT id, alamat_url, situs_lokal FROM situs_pantauan WHERE aktif = 1 ORDER BY id ASC')->fetchAll();
                 $berhasil = 0;
                 $gangguan = 0;
                 foreach ($targetAktif as $target) {
                     try {
-                        $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;
-                        if (!urlTargetValid($target['alamat_url'], $izinkanLokal)) {
+                        if (!urlTargetValid($target['alamat_url'], !empty($target['situs_lokal']))) {
                             throw new RuntimeException('Alamat tidak lolos validasi keamanan.');
                         }
                         $mulai = microtime(true);
@@ -246,15 +257,14 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                     : 'Pemeriksaan semua selesai: ' . $berhasil . ' berhasil, ' . $gangguan . ' gangguan dari ' . count($targetAktif) . ' situs aktif.';
                 $jenisPesan = $gangguan === 0 ? 'success' : 'error';
             } elseif ($aksi === 'periksa' && $id) {
-                $stmt = $pdo->prepare('SELECT id, alamat_url FROM situs_pantauan WHERE id = ? AND aktif = 1');
+                $stmt = $pdo->prepare('SELECT id, alamat_url, situs_lokal FROM situs_pantauan WHERE id = ? AND aktif = 1');
                 $stmt->execute(array($id));
                 $target = $stmt->fetch();
                 if (!$target) {
                     throw new InvalidArgumentException('Situs tidak ditemukan atau sedang dinonaktifkan.');
                 }
                 // Validasi ulang tepat sebelum permintaan; pengalihan dimatikan untuk mengurangi risiko SSRF.
-                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;
-                if (!urlTargetValid($target['alamat_url'], $izinkanLokal)) {
+                if (!urlTargetValid($target['alamat_url'], !empty($target['situs_lokal']))) {
                     throw new InvalidArgumentException('Alamat tidak lolos validasi keamanan saat pemeriksaan.');
                 }
                 if (!function_exists('curl_init')) {
@@ -304,7 +314,7 @@ if ($pdo) {
         if (isset($_GET['edit'])) {
             $editId = filter_var($_GET['edit'], FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
             if ($editId) {
-                $stmt = $pdo->prepare('SELECT id, nama, alamat_url, interval_detik FROM situs_pantauan WHERE id = ?');
+                $stmt = $pdo->prepare('SELECT id, nama, alamat_url, situs_lokal, interval_detik FROM situs_pantauan WHERE id = ?');
                 $stmt->execute(array($editId));
                 $edit = $stmt->fetch() ?: null;
             }
@@ -323,7 +333,7 @@ if ($pdo) {
                 }
             }
         }
-        $situs = $pdo->query("SELECT s.id, s.nama, s.alamat_url, s.aktif, s.interval_detik,
+        $situs = $pdo->query("SELECT s.id, s.nama, s.alamat_url, s.situs_lokal, s.aktif, s.interval_detik,
                 r.status, r.kode_http, r.waktu_respons_ms, r.pesan_kesalahan, r.diperiksa_pada
             FROM situs_pantauan s
             LEFT JOIN riwayat_pemeriksaan r ON r.id = (
@@ -343,7 +353,7 @@ if ($pdo) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Web Monitor</title>
 <style>
-:root{font-family:system-ui,sans-serif;color:#20252b;background:#f4f6f8}body{margin:0}header{background:#fff;border-bottom:1px solid #dfe3e8;padding:1.2rem max(1rem,calc((100% - 1100px)/2))}main{max-width:1100px;margin:2rem auto;padding:0 1rem}h1{margin:0;font-size:1.4rem}.muted{color:#5c6672;font-size:.9rem}.panel{background:#fff;border:1px solid #dfe3e8;border-radius:.7rem;padding:1rem;margin-bottom:1rem;overflow-x:auto}.notice{padding:.9rem 1rem;border-radius:.5rem;background:#fff7e6;border:1px solid #f0d69a}.success{background:#e4f7e9;border-color:#a6dfb5}.error{background:#fee2e2;border-color:#f3aaaa}table{width:100%;border-collapse:collapse;min-width:780px}th,td{text-align:left;padding:.7rem .55rem;border-bottom:1px solid #e8ebef;vertical-align:top}th{font-size:.85rem;color:#4a5561}.status{display:inline-block;border-radius:1rem;padding:.2rem .6rem;background:#edf0f3}.aktif{background:#dff5e6;color:#14532d}.gangguan{background:#fee2e2;color:#991b1b}label{display:block;margin:.7rem 0 .25rem}input{box-sizing:border-box;width:100%;max-width:100%;padding:.6rem;border:1px solid #b8c1cb;border-radius:.35rem}button,.button{display:inline-block;padding:.5rem .7rem;border:1px solid #b8c1cb;border-radius:.35rem;background:#fff;color:#175cd3;text-decoration:none;cursor:pointer;font:inherit}form.inline{display:inline}form.inline button{margin:.1rem}.actions{white-space:nowrap}a{color:#175cd3;overflow-wrap:anywhere}.button-primary{background:#16834a;border-color:#16834a;color:#fff}.button-secondary{background:#175cd3;border-color:#175cd3;color:#fff}.button-danger{background:#c62828;border-color:#c62828;color:#fff}.dashboard-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:1rem 0}.dashboard-toolbar h2{margin:0}.toolbar-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.toolbar-actions svg{width:18px;height:18px;vertical-align:middle}.icon-button{box-sizing:border-box;width:2.35rem;height:2.35rem;padding:.4rem;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;color:#344054}.icon-button svg{display:block;flex:none}.icon-button:hover{background:#eef2f6}.icon-button-danger{color:#b42318}.icon-button:focus-visible,.toolbar-actions button:focus-visible{outline:3px solid #84adff;outline-offset:2px}.actions form.inline{vertical-align:middle}.actions a,.actions button{margin:.1rem}.page-footer{display:flex;justify-content:flex-end;margin:2rem 0 1rem;padding-top:1rem;border-top:1px solid #dfe3e8}.dialog-situs{box-sizing:border-box;width:min(560px,calc(100vw - 2rem));min-width:min(300px,calc(100vw - 2rem));max-width:560px;height:min(560px,calc(100dvh - 2rem));min-height:min(320px,calc(100dvh - 2rem));max-height:calc(100dvh - 2rem);padding:0;border:1px solid #cbd2da;border-radius:.8rem;box-shadow:0 20px 60px #0003;overflow:hidden}.dialog-situs::backdrop{background:#17212b80}.dialog-layout{display:flex;flex-direction:column;height:100%;min-height:0}.dialog-layout>form{flex:1;min-height:0;height:auto}.dialog-head,.dialog-foot{flex:none;padding:1rem 1.2rem;background:#fff}.dialog-head{border-bottom:1px solid #e8ebef}.dialog-head h2{margin:0}.dialog-body{padding:.25rem 1.2rem 1rem;overflow:auto;flex:1;min-height:0}.dialog-foot{border-top:1px solid #e8ebef;display:flex;gap:.5rem;justify-content:flex-end;align-items:center}.dialog-head-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}.dialog-close{font-size:1.2rem;color:#20252b;padding:.25rem .55rem}.field-help{margin:.6rem 0 0}@media(max-width:480px){.dialog-situs{width:calc(100vw - 1rem);min-width:0;height:calc(100dvh - 1rem);min-height:0;max-height:calc(100dvh - 1rem);border-radius:.6rem}.dialog-head,.dialog-foot{padding:.8rem}.dialog-body{padding:.2rem .8rem .8rem}}
+:root{font-family:system-ui,sans-serif;color:#20252b;background:#f4f6f8}body{margin:0}header{background:#fff;border-bottom:1px solid #dfe3e8;padding:1.2rem max(1rem,calc((100% - 1100px)/2))}main{max-width:1100px;margin:2rem auto;padding:0 1rem}h1{margin:0;font-size:1.4rem}.muted{color:#5c6672;font-size:.9rem}.panel{background:#fff;border:1px solid #dfe3e8;border-radius:.7rem;padding:1rem;margin-bottom:1rem;overflow-x:auto}.notice{padding:.9rem 1rem;border-radius:.5rem;background:#fff7e6;border:1px solid #f0d69a}.success{background:#e4f7e9;border-color:#a6dfb5}.error{background:#fee2e2;border-color:#f3aaaa}table{width:100%;border-collapse:collapse;min-width:780px}th,td{text-align:left;padding:.7rem .55rem;border-bottom:1px solid #e8ebef;vertical-align:top}th{font-size:.85rem;color:#4a5561}.status{display:inline-block;border-radius:1rem;padding:.2rem .6rem;background:#edf0f3}.aktif{background:#dff5e6;color:#14532d}.gangguan{background:#fee2e2;color:#991b1b}label{display:block;margin:.7rem 0 .25rem}input{box-sizing:border-box;width:100%;max-width:100%;padding:.6rem;border:1px solid #b8c1cb;border-radius:.35rem}.local-checkbox{display:flex;align-items:center;gap:.55rem;margin-top:1rem}.local-checkbox input{width:auto;flex:none}button,.button{display:inline-block;padding:.5rem .7rem;border:1px solid #b8c1cb;border-radius:.35rem;background:#fff;color:#175cd3;text-decoration:none;cursor:pointer;font:inherit}form.inline{display:inline}form.inline button{margin:.1rem}.actions{white-space:nowrap}a{color:#175cd3;overflow-wrap:anywhere}.button-primary{background:#16834a;border-color:#16834a;color:#fff}.button-secondary{background:#175cd3;border-color:#175cd3;color:#fff}.button-danger{background:#c62828;border-color:#c62828;color:#fff}.dashboard-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:1rem 0}.dashboard-toolbar h2{margin:0}.toolbar-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.toolbar-actions svg{width:18px;height:18px;vertical-align:middle}.icon-button{box-sizing:border-box;width:2.35rem;height:2.35rem;padding:.4rem;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;color:#344054}.icon-button svg{display:block;flex:none}.icon-button:hover{background:#eef2f6}.icon-button-danger{color:#b42318}.icon-button:focus-visible,.toolbar-actions button:focus-visible{outline:3px solid #84adff;outline-offset:2px}.actions form.inline{vertical-align:middle}.actions a,.actions button{margin:.1rem}.page-footer{display:flex;justify-content:flex-end;margin:2rem 0 1rem;padding-top:1rem;border-top:1px solid #dfe3e8}.dialog-situs{box-sizing:border-box;width:min(560px,calc(100vw - 2rem));min-width:min(300px,calc(100vw - 2rem));max-width:560px;height:min(560px,calc(100dvh - 2rem));min-height:min(320px,calc(100dvh - 2rem));max-height:calc(100dvh - 2rem);padding:0;border:1px solid #cbd2da;border-radius:.8rem;box-shadow:0 20px 60px #0003;overflow:hidden}.dialog-situs::backdrop{background:#17212b80}.dialog-layout{display:flex;flex-direction:column;height:100%;min-height:0}.dialog-layout>form{flex:1;min-height:0;height:auto}.dialog-head,.dialog-foot{flex:none;padding:1rem 1.2rem;background:#fff}.dialog-head{border-bottom:1px solid #e8ebef}.dialog-head h2{margin:0}.dialog-body{padding:.25rem 1.2rem 1rem;overflow:auto;flex:1;min-height:0}.dialog-foot{border-top:1px solid #e8ebef;display:flex;gap:.5rem;justify-content:flex-end;align-items:center}.dialog-head-row{display:flex;align-items:center;justify-content:space-between;gap:1rem}.dialog-close{font-size:1.2rem;color:#20252b;padding:.25rem .55rem}.field-help{margin:.6rem 0 0}@media(max-width:480px){.dialog-situs{width:calc(100vw - 1rem);min-width:0;height:calc(100dvh - 1rem);min-height:0;max-height:calc(100dvh - 1rem);border-radius:.6rem}.dialog-head,.dialog-foot{padding:.8rem}.dialog-body{padding:.2rem .8rem .8rem}}
 </style>
 </head>
 <body>
@@ -362,7 +372,8 @@ if ($pdo) {
 <label for="nama">Nama situs</label><input id="nama" name="nama" maxlength="150" required value="<?php echo aman($edit ? $edit['nama'] : ''); ?>">
 <label for="alamat_url">Alamat URL</label><input id="alamat_url" name="alamat_url" type="url" maxlength="2048" placeholder="https://contoh.com" required value="<?php echo aman($edit ? $edit['alamat_url'] : ''); ?>">
 <label for="interval_detik">Interval pemeriksaan (detik, minimal 60)</label><input id="interval_detik" name="interval_detik" type="number" min="60" max="86400" required value="<?php echo aman($edit ? $edit['interval_detik'] : 300); ?>">
-<p class="muted field-help">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Target privat/lokal mengikuti pengaturan izinkan_alamat_lokal di pengaturan.php (default: nonaktif). Mengaktifkannya meningkatkan risiko SSRF; batasi akses dashboard ke jaringan tepercaya dan jangan publikasikan sebelum audit keamanan selesai.</p>
+<label class="local-checkbox" for="situs_lokal"><input id="situs_lokal" name="situs_lokal" type="checkbox" value="1"<?php echo ($edit && !empty($edit['situs_lokal'])) ? ' checked' : ''; ?>> Situs lokal</label>
+<p class="muted field-help">Centang untuk situs intranet atau hostname lokal. Situs publik biarkan tidak dicentang. Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Akses ke alamat lokal meningkatkan risiko SSRF; batasi dashboard ke jaringan tepercaya.</p>
 </div>
 <div class="dialog-foot"><button type="button" id="batal-dialog-situs">Batal</button><button type="submit">Simpan situs</button></div>
 </form>
