@@ -41,3 +41,21 @@ Pemeriksa situs berisiko disalahgunakan untuk mengakses jaringan internal. Batas
 - PATCH untuk perbaikan bug atau keamanan tanpa menyelesaikan fase/menambah kemampuan utama.
 - MAJOR untuk perubahan tidak kompatibel terhadap kontrak atau konfigurasi yang dirilis. Sebelum 1.0.0, jelaskan dampak perubahan dengan jelas.
 - Gunakan Keep a Changelog dan Semantic Versioning.
+
+## Rilis otomatis dari CHANGELOG.md
+
+Workflow `.github/workflows/release.yml` memeriksa perubahan `CHANGELOG.md` yang masuk ke `main`. Workflow menerbitkan GitHub Release dan tag `vX.Y.Z` dari bagian versi bertanggal pertama yang cocok dengan format:
+
+```markdown
+## [0.2.0] - 2026-10-17
+
+### Ditambahkan
+- Fitur yang sudah selesai dan diuji.
+```
+
+- Bagian `[Belum dirilis]` tidak pernah diterbitkan.
+- Bagian versi harus memakai format `## [MAJOR.MINOR.PATCH] - YYYY-MM-DD` dan berisi catatan rilis.
+- Perubahan ke `CHANGELOG.md` tanpa bagian versi bertanggal akan dilewati.
+- Jika tag versi sudah ada, workflow tidak menimpa rilis sebelumnya.
+- Workflow dapat dijalankan manual dari tab Actions, tetapi tetap hanya menerbitkan versi bertanggal yang ada di changelog.
+- Sebelum menambahkan heading versi bertanggal, pastikan kriteria penerimaan fase dan pengujian telah lulus. Jangan memindahkan isi ke bagian versi rilis hanya untuk memicu workflow.
