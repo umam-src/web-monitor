@@ -13,7 +13,7 @@ function aman($nilai)
     return htmlspecialchars((string) $nilai, ENT_QUOTES, 'UTF-8');
 }
 
-function urlPublikValid($url)
+function urlTargetValid($url, $izinkanLokal = false)
 {
     if (!is_string($url) || strlen($url) > 2048 || !filter_var($url, FILTER_VALIDATE_URL)) {
         return false;
@@ -25,14 +25,15 @@ function urlPublikValid($url)
         return false;
     }
     $host = trim($bagian['host'], '[]');
+    $filterFlags = $izinkanLokal ? 0 : (FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     if (filter_var($host, FILTER_VALIDATE_IP)) {
-        return (bool) filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+        return (bool) filter_var($host, FILTER_VALIDATE_IP, $filterFlags);
     }
-    if (strpos($host, '.') === false || preg_match('/\.local$/i', $host)) {
+    if (!$izinkanLokal && (strpos($host, '.') === false || preg_match('/\\.local$/i', $host))) {
         return false;
     }
     $ip = gethostbyname($host);
-    return $ip !== $host && (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    return $ip !== $host && (bool) filter_var($ip, FILTER_VALIDATE_IP, $filterFlags);
 }
 
 function tokenValid()
@@ -130,8 +131,8 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                 if ($nama === '' || strlen($nama) > 150) {
                     throw new InvalidArgumentException('Nama wajib diisi dan maksimal 150 karakter.');
                 }
-                if (!urlPublikValid($url)) {
-                    throw new InvalidArgumentException('Alamat harus berupa URL HTTP/HTTPS publik yang valid. Alamat privat/lokal ditolak.');
+                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;\n                if (!urlTargetValid($url, $izinkanLokal)) {
+                    throw new InvalidArgumentException('Alamat harus berupa URL HTTP/HTTPS valid. Target privat/lokal hanya diizinkan jika pengaturan izinkan_alamat_lokal aktif.');
                 }
                 if ($interval === false || $interval < 60 || $interval > 86400) {
                     throw new InvalidArgumentException('Interval harus antara 60 dan 86400 detik.');
@@ -164,7 +165,7 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                     throw new InvalidArgumentException('Situs tidak ditemukan atau sedang dinonaktifkan.');
                 }
                 // Validasi ulang tepat sebelum permintaan; pengalihan dimatikan untuk mengurangi risiko SSRF.
-                if (!urlPublikValid($target['alamat_url'])) {
+                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;\n                if (!urlTargetValid($target['alamat_url'], $izinkanLokal)) {
                     throw new InvalidArgumentException('Alamat tidak lolos validasi keamanan saat pemeriksaan.');
                 }
                 if (!function_exists('curl_init')) {
@@ -273,7 +274,7 @@ if ($pdo) {
 <label for="interval_detik">Interval pemeriksaan (detik, minimal 60)</label><input id="interval_detik" name="interval_detik" type="number" min="60" max="86400" required value="<?php echo aman($edit ? $edit['interval_detik'] : 300); ?>">
 <p><button type="submit">Simpan situs</button> <?php if ($edit): ?><a class="button" href="index.php">Batal</a><?php endif; ?></p>
 </form>
-<p class="muted">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Alamat IP privat/lokal ditolak. Akses dashboard memerlukan login. Jangan publikasikan sebelum mitigasi SSRF dan audit keamanan selesai.</p>
+<p class="muted">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Target privat/lokal mengikuti pengaturan izinkan_alamat_lokal di pengaturan.php (default: nonaktif). Mengaktifkannya meningkatkan risiko SSRF; batasi akses dashboard ke jaringan tepercaya dan jangan publikasikan sebelum audit keamanan selesai.</p>
 </section>
 <?php if ($riwayatSitus): ?>
 <section class="panel">
