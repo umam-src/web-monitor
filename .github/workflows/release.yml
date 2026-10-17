@@ -1,0 +1,88 @@
+name: Rilis dari CHANGELOG
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - CHANGELOG.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rilis:
+    name: Terbitkan rilis yang tercatat
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ambil repositori
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Baca versi dan catatan rilis
+        id: catatan
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Hanya heading versi bertanggal yang boleh dirilis. [Belum dirilis] diabaikan.
+          heading="$(grep -m1 -E '^## \[[0-9]+\.[0-9]+\.[0-9]+\] - [0-9]{4}-[0-9]{2}-[0-9]{2}$' CHANGELOG.md || true)"
+          if [[ -z "$heading" ]]; then
+            echo "Tidak ada bagian versi bertanggal di CHANGELOG.md; tidak menerbitkan rilis."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          version="$(printf '%s' "$heading" | sed -E 's/^## \[([^]]+)\] - .*/\1/')"
+          release_date="$(printf '%s' "$heading" | sed -E 's/^## \[[^]]+\] - ([0-9]{4}-[0-9]{2}-[0-9]{2})$/\1/')"
+          tag="v$version"
+
+          # Pastikan tanggal nyata dan versi/tag tidak kosong.
+          date -d "$release_date" '+%Y-%m-%d' >/dev/null
+          if [[ "$tag" == "v" ]]; then
+            echo "Versi tidak valid." >&2
+            exit 1
+          fi
+
+          # Ambil isi bagian versi sampai heading level 2 berikutnya.
+          awk -v heading="$heading" '
+            $0 == heading { capture=1; next }
+            /^## / && capture { exit }
+            capture { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "Bagian $tag tidak memiliki catatan rilis." >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "release_date=$release_date" >> "$GITHUB_OUTPUT"
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
+      - name: Lewati jika tag sudah ada
+        id: tag
+        if: steps.catatan.outputs.should_release == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.catatan.outputs.tag }}
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG sudah ada; tidak mengubah rilis yang sudah diterbitkan."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Terbitkan GitHub Release
+        if: steps.catatan.outputs.should_release == 'true' && steps.tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.catatan.outputs.tag }}
+          name: ${{ steps.catatan.outputs.tag }}
+          body_path: release-notes.md
+          target_commitish: ${{ github.sha }}
+          draft: false
+          prerelease: ${{ startsWith(steps.catatan.outputs.version, '0.') && steps.catatan.outputs.version == '0.0.0' }}
