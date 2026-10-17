@@ -126,6 +126,45 @@ function opsiDnsPublik($url)
     return array(CURLOPT_RESOLVE => array(strtolower($host) . ':' . $port . ':' . $ip));
 }
 
+function periksaHttp($url, $situsLokal)
+{
+    $opsiCurl = array(
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HEADER => false,
+        CURLOPT_NOBODY => true,
+        CURLOPT_FOLLOWLOCATION => false,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_USERAGENT => 'WebMonitor/0.2',
+    );
+    if (!$situsLokal) {
+        try {
+            $opsiCurl = $opsiCurl + opsiDnsPublik($url);
+        } catch (Exception $galatDns) {
+            return array(
+                'status' => 'gangguan',
+                'kode' => null,
+                'durasi' => 0,
+                'pesan' => substr($galatDns->getMessage(), 0, 500),
+            );
+        }
+    }
+    $mulai = microtime(true);
+    $ch = curl_init($url);
+    curl_setopt_array($ch, $opsiCurl);
+    curl_exec($ch);
+    $kode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $durasi = (int) round((microtime(true) - $mulai) * 1000);
+    $errNo = curl_errno($ch);
+    $err = $errNo ? curl_error($ch) : null;
+    curl_close($ch);
+    $status = (!$errNo && $kode >= 200 && $kode < 400) ? 'aktif' : 'gangguan';
+    $ringkas = $err ? substr($err, 0, 500) : (($kode === 0) ? 'Tidak menerima kode HTTP.' : null);
+    return array('status' => $status, 'kode' => $kode ?: null, 'durasi' => $durasi, 'pesan' => $ringkas);
+}
+
 function ikon($nama)
 {
     $jalur = array(
@@ -287,31 +326,11 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                         if (!urlTargetValid($target['alamat_url'], !empty($target['situs_lokal']))) {
                             throw new RuntimeException('Alamat tidak lolos validasi keamanan.');
                         }
-                        $mulai = microtime(true);
-                        $ch = curl_init($target['alamat_url']);
-                        $opsiCurl = array(
-                            CURLOPT_RETURNTRANSFER => true,
-                            CURLOPT_HEADER => false,
-                            CURLOPT_NOBODY => true,
-                            CURLOPT_FOLLOWLOCATION => false,
-                            CURLOPT_CONNECTTIMEOUT => 5,
-                            CURLOPT_TIMEOUT => 15,
-                            CURLOPT_SSL_VERIFYPEER => true,
-                            CURLOPT_SSL_VERIFYHOST => 2,
-                            CURLOPT_USERAGENT => 'WebMonitor/0.2',
-                        );
-                        if (empty($target['situs_lokal'])) {
-                            $opsiCurl = $opsiCurl + opsiDnsPublik($target['alamat_url']);
-                        }
-                        curl_setopt_array($ch, $opsiCurl);
-                        curl_exec($ch);
-                        $kode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                        $durasi = (int) round((microtime(true) - $mulai) * 1000);
-                        $errNo = curl_errno($ch);
-                        $err = $errNo ? curl_error($ch) : null;
-                        curl_close($ch);
-                        $status = (!$errNo && $kode >= 200 && $kode < 400) ? 'aktif' : 'gangguan';
-                        $ringkas = $err ? substr($err, 0, 500) : (($kode === 0) ? 'Tidak menerima kode HTTP.' : null);
+                        $hasilPeriksa = periksaHttp($target['alamat_url'], !empty($target['situs_lokal']));
+                        $kode = $hasilPeriksa['kode'];
+                        $durasi = $hasilPeriksa['durasi'];
+                        $status = $hasilPeriksa['status'];
+                        $ringkas = $hasilPeriksa['pesan'];
                         $simpanHasil = $pdo->prepare('INSERT INTO riwayat_pemeriksaan (situs_id, status, kode_http, waktu_respons_ms, pesan_kesalahan) VALUES (?, ?, ?, ?, ?)');
                         $simpanHasil->execute(array($target['id'], $status, $kode ?: null, $durasi, $ringkas));
                         if ($status === 'aktif') {
@@ -342,34 +361,14 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                 if (!function_exists('curl_init')) {
                     throw new RuntimeException('Ekstensi cURL PHP belum tersedia.');
                 }
-                $mulai = microtime(true);
-                $ch = curl_init($target['alamat_url']);
-                $opsiCurl = array(
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_HEADER => false,
-                    CURLOPT_NOBODY => true,
-                    CURLOPT_FOLLOWLOCATION => false,
-                    CURLOPT_CONNECTTIMEOUT => 5,
-                    CURLOPT_TIMEOUT => 15,
-                    CURLOPT_SSL_VERIFYPEER => true,
-                    CURLOPT_SSL_VERIFYHOST => 2,
-                    CURLOPT_USERAGENT => 'WebMonitor/0.2',
-                );
-                if (empty($target['situs_lokal'])) {
-                    $opsiCurl = $opsiCurl + opsiDnsPublik($target['alamat_url']);
-                }
-                curl_setopt_array($ch, $opsiCurl);
-                curl_exec($ch);
-                $kode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $durasi = (int) round((microtime(true) - $mulai) * 1000);
-                $errNo = curl_errno($ch);
-                $err = $errNo ? curl_error($ch) : null;
-                curl_close($ch);
-                $status = (!$errNo && $kode >= 200 && $kode < 400) ? 'aktif' : 'gangguan';
-                $ringkas = $err ? substr($err, 0, 500) : (($kode === 0) ? 'Tidak menerima kode HTTP.' : null);
+                $hasilPeriksa = periksaHttp($target['alamat_url'], !empty($target['situs_lokal']));
+                $kode = $hasilPeriksa['kode'];
+                $durasi = $hasilPeriksa['durasi'];
+                $status = $hasilPeriksa['status'];
+                $ringkas = $hasilPeriksa['pesan'];
                 $stmt = $pdo->prepare('INSERT INTO riwayat_pemeriksaan (situs_id, status, kode_http, waktu_respons_ms, pesan_kesalahan) VALUES (?, ?, ?, ?, ?)');
                 $stmt->execute(array($id, $status, $kode ?: null, $durasi, $ringkas));
-                $pesan = 'Pemeriksaan selesai: ' . ($status === 'aktif' ? 'respons HTTP berhasil.' : 'gangguan terdeteksi.') . ($kode ? ' Kode HTTP ' . $kode . '.' : '') . ($err ? ' ' . $err : '');
+                $pesan = 'Pemeriksaan selesai: ' . ($status === 'aktif' ? 'respons HTTP berhasil.' : 'gangguan terdeteksi.') . ($kode ? ' Kode HTTP ' . $kode . '.' : '') . ($ringkas ? ' ' . $ringkas : '');
                 $jenisPesan = $status === 'aktif' ? 'success' : 'error';
             } else {
                 throw new InvalidArgumentException('Aksi tidak dikenal atau parameter tidak valid.');
