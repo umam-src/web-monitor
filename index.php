@@ -25,7 +25,7 @@ function urlTargetValid($url, $izinkanLokal = false)
         return false;
     }
     $host = trim($bagian['host'], '[]');
-    $filterFlags = $izinkanLokal ? 0 : (FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    $filterFlags = $izinkanLokal ? FILTER_FLAG_NO_RES_RANGE : (FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     if (filter_var($host, FILTER_VALIDATE_IP)) {
         return (bool) filter_var($host, FILTER_VALIDATE_IP, $filterFlags);
     }
