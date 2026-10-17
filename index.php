@@ -131,7 +131,8 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                 if ($nama === '' || strlen($nama) > 150) {
                     throw new InvalidArgumentException('Nama wajib diisi dan maksimal 150 karakter.');
                 }
-                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;\n                if (!urlTargetValid($url, $izinkanLokal)) {
+                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;
+                if (!urlTargetValid($url, $izinkanLokal)) {
                     throw new InvalidArgumentException('Alamat harus berupa URL HTTP/HTTPS valid. Target privat/lokal hanya diizinkan jika pengaturan izinkan_alamat_lokal aktif.');
                 }
                 if ($interval === false || $interval < 60 || $interval > 86400) {
