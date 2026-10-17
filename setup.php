@@ -200,7 +200,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <p class="muted">Akun harus memiliki hak membuat tabel dan hak baca/tulis pada database ini. Kata sandi ini hanya digunakan untuk setup dan koneksi aplikasi yang disimpan di konfigurasi terlindungi.</p>
 <h2>Administrator Web Monitor</h2>
 <label for="admin">Nama pengguna administrator</label><input id="admin" name="admin" minlength="3" maxlength="80" required>
-<label for="password_admin">Kata sandi administrator (minimal 12 karakter)</label><input id="password_admin" name="password_admin" type="password" minlength="12" autocomplete="new-password" required>\n<label><input type="checkbox" name="izinkan_alamat_lokal" value="1" style="width:auto"> Izinkan target intranet, hostname lokal, dan IP privat</label>\n<p class="muted">Nonaktifkan untuk pemantauan publik biasa. Jika diaktifkan, Web Monitor dapat meminta alamat internal dari servernya; gunakan hanya pada jaringan tepercaya karena risiko SSRF meningkat.</p>
+<label for="password_admin">Kata sandi administrator (minimal 12 karakter)</label><input id="password_admin" name="password_admin" type="password" minlength="12" autocomplete="new-password" required>
+<label><input type="checkbox" name="izinkan_alamat_lokal" value="1" style="width:auto"> Izinkan target intranet, hostname lokal, dan IP privat</label>
+<p class="muted">Nonaktifkan untuk pemantauan publik biasa. Jika diaktifkan, Web Monitor dapat meminta alamat internal dari servernya; gunakan hanya pada jaringan tepercaya karena risiko SSRF meningkat.</p>
 <p><button type="submit">Uji koneksi dan instal otomatis</button></p>
 </form>
 <?php endif; ?>
