@@ -35,6 +35,12 @@ Web Monitor adalah proyek kecil yang dikerjakan langsung pada `main`. Jangan mem
 ## Keamanan pemantauan
 Pemeriksa situs berisiko disalahgunakan untuk mengakses jaringan internal. Batasi protokol ke HTTP/HTTPS, validasi alamat, blokir tujuan privat/loopback/link-local, validasi ulang setelah DNS dan pengalihan, batasi waktu dan ukuran respons, serta jangan mencatat isi respons mentah atau rahasia.
 
+## Gate fase dan blocker
+- Periksa [BLOCKERS.md](BLOCKERS.md) sebelum memulai fase roadmap atau mempersiapkan rilis.
+- Jangan mulai fase berikutnya hanya karena sebagian kode fase tersebut sudah ada. Semua gate wajib fase sebelumnya harus ditutup dengan bukti.
+- Status fase hanya boleh diubah menjadi lulus setelah CI, uji runtime, pemasangan, dan pemeriksaan keamanan yang relevan berhasil; catat bukti di log kerja.
+- Jangan buat heading rilis bertanggal di CHANGELOG.md selama gate fase belum lulus.
+
 ## Versi dan fase roadmap
 - Setiap fase roadmap yang selesai dan menambah kemampuan kompatibel menghasilkan rilis MINOR tersendiri. Fase 0 sampai 5 menargetkan 0.1.0 sampai 0.6.0; lihat TODO.md untuk kriteria penerimaan.
 - Jangan merilis versi target hanya karena pekerjaan dimulai. Semua kriteria penerimaan fase harus lulus, pengujian harus diverifikasi, dan CHANGELOG.md harus diperbarui.
