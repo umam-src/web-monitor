@@ -24,9 +24,10 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Catat bahwa database telah diatur melalui phpMyAdmin pada `127.0.0.1`.
 - [ ] Verifikasi profil PHP yang dipakai situs Web Monitor serta ekstensi aktif: PDO, PDO MySQL, cURL, dan OpenSSL.
 - [ ] Uji koneksi Web Monitor ke database di `127.0.0.1`; pastikan nama database dan hak akun aplikasi benar.
-- [ ] Rancang dan verifikasi wizard pemasangan berbasis GUI; tidak boleh membutuhkan CLI pada sisi pengguna.
-- [ ] Wizard memeriksa prasyarat dan koneksi MariaDB. Karena database sudah diatur melalui phpMyAdmin, tentukan dari pemeriksaan apakah wizard perlu membuat database/tabel atau cukup memvalidasi database dan akun yang sudah ada. Jangan menyimpan kredensial administratif.
-- [ ] Wizard membuat akun administrator aplikasi pertama setelah koneksi database berhasil, lalu mengunci pemasangan ulang.
+- [x] Implementasikan wizard browser `setup.php` tanpa CLI untuk menguji koneksi ke database yang sudah ada dan membuat tabel otomatis.
+- [x] Implementasikan pembuatan akun administrator pertama dengan hash kata sandi dan penguncian wizard setelah konfigurasi berhasil disimpan.
+- [x] Tambahkan login/logout administrator dan lindungi dashboard serta tindakan dengan sesi login.
+- [ ] Uji wizard, hak membuat tabel, login/logout, dan penguncian setup pada PHP 7.4/MariaDB di NAS target.
 - [ ] Verifikasi panduan pemasangan pada lingkungan Synology yang bersih.
 - [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
 - [x] Tambahkan uji penerapan skema pada MySQL 8.0 di CI.
@@ -89,14 +90,14 @@ Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keama
 - [ ] Laporan dan ekspor.
 - [ ] Banyak akun/organisasi.
 
-## Persyaratan instalasi dan akun (rancangan, belum diimplementasikan)
+## Wizard instalasi dan akun (implementasi awal; verifikasi runtime masih terbuka)
 
 - Seluruh langkah pemasangan dan pengaturan untuk pengguna dilakukan lewat GUI DSM dan wizard browser; tidak mengharuskan SSH, terminal, atau perintah CLI.
 - Target DSM yang diketahui: 7.2.2 pada Synology DS923+. Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang; database sudah diatur melalui phpMyAdmin pada `127.0.0.1`. Versi/profil PHP aktif, ekstensi, nama database, hak akun aplikasi, dan koneksi dari aplikasi masih perlu diverifikasi.
-- Wizard memeriksa PHP 7.4, PDO, PDO MySQL, cURL, OpenSSL, sesi, izin direktori konfigurasi, dan koneksi MariaDB sebelum melanjutkan.
-- Untuk pembuatan database otomatis, wizard meminta kredensial MariaDB yang memang memiliki izin membuat database dan pengguna/grant. Kredensial administratif hanya digunakan selama langkah instalasi, tidak disimpan dalam konfigurasi aplikasi dan tidak ditampilkan kembali.
-- Wizard membuat database khusus dan akun MariaDB khusus aplikasi dengan hak minimum pada database tersebut. Jika kredensial yang diberikan tidak memiliki hak yang diperlukan, wizard berhenti dengan pesan jelas dan menyediakan jalur GUI alternatif; tidak mencoba melewati hak akses.
-- Setelah database siap, wizard meminta nama pengguna dan kata sandi administrator Web Monitor, menyimpan hash kata sandi yang kuat, lalu menutup endpoint installer dengan penanda instalasi selesai.
+- Wizard memeriksa PDO MySQL, format host/nama database, izin tulis folder konfigurasi, dan koneksi MariaDB. Verifikasi menyeluruh semua ekstensi PHP yang diperlukan masih perlu ditambahkan/diuji.
+- Karena database sudah dibuat sebelumnya, wizard meminta kredensial untuk database tersebut dan membuat tabel otomatis. Akun MariaDB harus memiliki hak membuat tabel serta baca/tulis pada database itu; wizard tidak membuat database atau akun MariaDB baru. Kredensial yang dimasukkan disimpan sebagai kredensial koneksi runtime di `pengaturan.php`, jadi gunakan akun aplikasi berhak minimum dan bukan akun root.
+- Setelah database siap, wizard meminta nama pengguna dan kata sandi administrator Web Monitor, menyimpan hash kata sandi, dan menutup endpoint installer ketika `pengaturan.php` sudah dibuat.
+- Dashboard kini meminta login administrator; pengujian sesi, pembatasan percobaan login, dan audit autentikasi masih perlu dilakukan.
 - Jangan menggunakan akun root MariaDB untuk koneksi harian aplikasi. Jangan membuat kredensial default, kata sandi bawaan, atau endpoint setup yang tetap terbuka.
 - Kredensial database aplikasi disimpan dalam berkas konfigurasi di luar Git dan tidak boleh dapat diunduh atau disajikan sebagai teks melalui web. Izin berkas harus dibatasi ke akun layanan yang menjalankan PHP sejauh dapat dilakukan melalui GUI DSM.
 - Semua langkah pemasangan dapat dilakukan lewat File Station, Package Center, Web Station, dan browser. Pengunggahan/penempatan berkas dapat memakai File Station atau SMB; tidak ada perintah terminal dalam petunjuk pengguna.
