@@ -43,6 +43,8 @@ $pesan = '';
 $jenisPesan = 'info';
 $situs = array();
 $edit = null;
+$riwayatSitus = null;
+$riwayat = array();
 $berkasPengaturan = __DIR__ . '/pengaturan.php';
 $pdo = null;
 
@@ -169,6 +171,20 @@ if ($pdo) {
                 $edit = $stmt->fetch() ?: null;
             }
         }
+        if (isset($_GET['riwayat'])) {
+            $riwayatId = filter_var($_GET['riwayat'], FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
+            if ($riwayatId) {
+                $stmt = $pdo->prepare('SELECT id, nama FROM situs_pantauan WHERE id = ?');
+                $stmt->execute(array($riwayatId));
+                $riwayatSitus = $stmt->fetch() ?: null;
+                if ($riwayatSitus) {
+                    $stmt = $pdo->prepare('SELECT status, kode_http, waktu_respons_ms, pesan_kesalahan, diperiksa_pada
+                        FROM riwayat_pemeriksaan WHERE situs_id = ? ORDER BY diperiksa_pada DESC, id DESC LIMIT 20');
+                    $stmt->execute(array($riwayatId));
+                    $riwayat = $stmt->fetchAll();
+                }
+            }
+        }
         $situs = $pdo->query("SELECT s.id, s.nama, s.alamat_url, s.aktif, s.interval_detik,
                 r.status, r.kode_http, r.waktu_respons_ms, r.pesan_kesalahan, r.diperiksa_pada
             FROM situs_pantauan s
@@ -209,6 +225,23 @@ if ($pdo) {
 </form>
 <p class="muted">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Alamat IP privat/lokal ditolak. Aplikasi ini belum memiliki autentikasi; jangan publikasikan.</p>
 </section>
+<?php if ($riwayatSitus): ?>
+<section class="panel">
+<h2>Riwayat pemeriksaan: <?php echo aman($riwayatSitus['nama']); ?></h2>
+<p class="muted">Menampilkan maksimal 20 pemeriksaan terbaru.</p>
+<?php if (!$riwayat): ?><p>Belum ada riwayat pemeriksaan.</p><?php else: ?>
+<table><thead><tr><th>Waktu</th><th>Status</th><th>HTTP</th><th>Respons</th><th>Keterangan</th></tr></thead><tbody>
+<?php foreach ($riwayat as $item): ?>
+<tr><td><?php echo aman($item['diperiksa_pada']); ?></td>
+<td><span class="status <?php echo aman($item['status']); ?>"><?php echo aman(ucfirst($item['status'])); ?></span></td>
+<td><?php echo aman($item['kode_http'] === null ? '—' : $item['kode_http']); ?></td>
+<td><?php echo aman($item['waktu_respons_ms'] === null ? '—' : $item['waktu_respons_ms'] . ' ms'); ?></td>
+<td><?php echo aman($item['pesan_kesalahan'] ? $item['pesan_kesalahan'] : '—'); ?></td></tr>
+<?php endforeach; ?>
+</tbody></table><?php endif; ?>
+<p><a class="button" href="index.php">Tutup riwayat</a></p>
+</section>
+<?php endif; ?>
 <section class="panel"><h2>Daftar situs</h2>
 <?php if (!$situs): ?><p>Belum ada situs terdaftar.</p><?php else: ?>
 <table><thead><tr><th>Situs</th><th>Status</th><th>HTTP</th><th>Respons</th><th>Pemeriksaan terakhir</th><th>Tindakan</th></tr></thead><tbody>
@@ -216,7 +249,8 @@ if ($pdo) {
 <tr><td><strong><?php echo aman($baris['nama']); ?></strong><br><a href="<?php echo aman($baris['alamat_url']); ?>" rel="noreferrer noopener"><?php echo aman($baris['alamat_url']); ?></a><br><span class="muted">Setiap <?php echo aman($baris['interval_detik']); ?> detik</span></td>
 <td><span class="status <?php echo aman($baris['status'] ? $baris['status'] : ''); ?>"><?php echo aman($baris['status'] ? ucfirst(str_replace('_',' ',$baris['status'])) : ($baris['aktif'] ? 'Belum diperiksa' : 'Nonaktif')); ?></span></td>
 <td><?php echo aman($baris['kode_http'] === null ? '—' : $baris['kode_http']); ?></td><td><?php echo aman($baris['waktu_respons_ms'] === null ? '—' : $baris['waktu_respons_ms'].' ms'); ?></td><td><?php echo aman($baris['diperiksa_pada'] ? $baris['diperiksa_pada'] : '—'); ?><?php if ($baris['pesan_kesalahan']): ?><br><span class="muted"><?php echo aman($baris['pesan_kesalahan']); ?></span><?php endif; ?></td>
-<td class="actions"><a class="button" href="index.php?edit=<?php echo aman($baris['id']); ?>">Ubah</a>
+<td class="actions"><a class="button" href="index.php?riwayat=<?php echo aman($baris['id']); ?>">Riwayat</a>
+<a class="button" href="index.php?edit=<?php echo aman($baris['id']); ?>">Ubah</a>
 <form class="inline" method="post"><input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="id" value="<?php echo aman($baris['id']); ?>"><input type="hidden" name="aksi" value="toggle"><button type="submit"><?php echo $baris['aktif'] ? 'Nonaktifkan' : 'Aktifkan'; ?></button></form>
 <?php if ($baris['aktif']): ?><form class="inline" method="post"><input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="id" value="<?php echo aman($baris['id']); ?>"><input type="hidden" name="aksi" value="periksa"><button type="submit">Periksa</button></form><?php endif; ?>
 <form class="inline" method="post" onsubmit="return confirm('Hapus situs dan seluruh riwayatnya?');"><input type="hidden" name="token" value="<?php echo aman($token); ?>"><input type="hidden" name="id" value="<?php echo aman($baris['id']); ?>"><input type="hidden" name="aksi" value="hapus"><button type="submit">Hapus</button></form></td></tr>
