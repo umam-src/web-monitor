@@ -1,0 +1,47 @@
+name: Pemeriksaan dasar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pemeriksaan:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: web_monitor
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Siapkan PHP 7.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: pdo_mysql
+          coverage: none
+
+      - name: Periksa sintaks PHP
+        run: |
+          php -l index.php
+          php -l pengaturan.contoh.php
+
+      - name: Uji penerapan skema basis data
+        env:
+          MYSQL_PWD: root
+        run: |
+          mysql --host=127.0.0.1 --user=root web_monitor < database/schema.sql
+          test "$(mysql --batch --skip-column-names --host=127.0.0.1 --user=root web_monitor -e "SHOW TABLES LIKE 'situs_pantauan'")" = "situs_pantauan"
+          test "$(mysql --batch --skip-column-names --host=127.0.0.1 --user=root web_monitor -e "SHOW TABLES LIKE 'riwayat_pemeriksaan'")" = "riwayat_pemeriksaan"
