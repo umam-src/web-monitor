@@ -8,6 +8,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 - Verifikasi runtime wizard setup dan login pada NAS Synology target; masih menunggu pengujian.
 
 ### Ditambahkan
+- Dialog tambah/ubah situs dengan ukuran berbasis viewport, batas minimum/maksimum, dan area isi yang dapat digulir.
 - Wizard browser `setup.php` menguji koneksi ke database yang sudah ada dan membuat tabel situs, riwayat, serta akun administrator secara otomatis tanpa phpMyAdmin.
 - Login/logout administrator dasar; dashboard dan tindakan memerlukan sesi login.
 - Tampilan riwayat hingga 20 pemeriksaan terbaru per situs, diakses dari daftar situs.
