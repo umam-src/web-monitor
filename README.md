@@ -32,7 +32,16 @@ Target perangkat: **Synology DS923+ dengan DSM 7.2.2**. Target penggunaan adalah
 
 Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada DS923+ dengan DSM 7.2.2, serta database sudah diatur melalui phpMyAdmin pada `127.0.0.1`. Profil PHP yang benar-benar dipakai situs, ekstensi aktif, hak akun database, dan koneksi dari aplikasi tetap harus diuji. Dokumentasi resmi Synology untuk DSM 7.2 mencantumkan PHP 7.4 sebagai backend Web Station yang didukung dan menjelaskan pengaturan ekstensi lewat GUI. [Spesifikasi Web Station DSM 7.2](https://www.synology.com/en-au/dsm/7.2/software_spec/web_station) · [Pengaturan profil PHP](https://kb.synology.com/en-global/DSM/help/WebStation/application_webserv_php).
 
-### Rancangan wizard instalasi (belum diimplementasikan)
+### Wizard instalasi otomatis (`setup.php`)
+
+1. Letakkan berkas proyek pada folder situs Web Station melalui File Station atau SMB.
+2. Pastikan profil PHP 7.4 untuk situs mengaktifkan PDO MySQL, cURL, dan OpenSSL. Folder aplikasi harus dapat ditulis PHP saat instalasi agar konfigurasi dapat dibuat.
+3. Buka `setup.php` dari browser di perangkat lokal atau jaringan privat.
+4. Masukkan host `127.0.0.1`, nama database yang sudah dibuat, dan kredensial MariaDB yang memiliki hak membuat tabel pada database itu. Tidak perlu membuka phpMyAdmin atau membuat database lagi.
+5. Pilih nama pengguna dan kata sandi administrator Web Monitor (minimal 12 karakter), lalu jalankan instalasi. Wizard menguji koneksi, membuat tabel situs/riwayat/akun, membuat administrator, dan menyimpan konfigurasi.
+6. Setelah berhasil, wizard terkunci karena berkas `pengaturan.php` sudah dibuat. Masuk melalui `index.php`.
+
+Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Jika koneksi atau izin folder gagal, wizard berhenti dengan pesan aman; tidak mencoba melewati hak MariaDB. Kredensial yang dimasukkan menjadi kredensial koneksi aplikasi yang disimpan di `pengaturan.php`, jadi gunakan akun database khusus berhak minimum, bukan root.
 
 1. Periksa profil PHP yang dipakai situs, ekstensi wajib, izin direktori, dan koneksi MariaDB.
 2. Uji apakah database dan akun aplikasi yang sudah dibuat melalui phpMyAdmin dapat digunakan oleh Web Monitor.
@@ -44,17 +53,7 @@ Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada DS9
 
 Jangan gunakan akun root MariaDB untuk koneksi harian aplikasi. Jangan gunakan kata sandi default. Wizard harus dibatasi ke akses lokal/tepercaya, memakai perlindungan CSRF, dan menutup dirinya setelah instalasi sukses.
 
-## Pemasangan awal untuk lingkungan terlindungi
-
-1. Buat basis data MySQL/MariaDB bernama `web_monitor`.
-2. Jalankan `database/schema.sql` pada basis data tersebut.
-3. Salin `pengaturan.contoh.php` menjadi `pengaturan.php`, lalu isi DSN, nama pengguna, dan rahasia basis data.
-4. Pastikan `pengaturan.php` tidak masuk ke Git; berkas ini tercantum di `.gitignore`.
-5. Arahkan server web ke direktori aplikasi hanya pada lingkungan pengembangan yang terlindungi.
-6. Pastikan PHP 7.4 dan semua ekstensi yang dibutuhkan aktif.
-7. Buka aplikasi dan uji alur tambah situs serta pemeriksaan manual hanya terhadap alamat publik yang aman.
-
-Langkah ini belum dianggap sebagai prosedur pemasangan terverifikasi. Gate Fase 0 mensyaratkan pemasangan dari kondisi bersih pada perangkat target atau lingkungan setara yang didokumentasikan. Jangan gunakan data produksi sebelum prosedur itu berhasil diuji.
+Wizard otomatis telah tersedia, tetapi pemasangan belum dianggap terverifikasi sampai uji pada NAS target atau lingkungan setara berhasil. Jangan gunakan data produksi sebelum prosedur itu berhasil diuji.
 
 ## Status fase dan dokumen
 
