@@ -20,10 +20,12 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Buat contoh pengaturan lokal dan .gitignore.
 - [x] Catat versi DSM target: DSM 7.2.2.
 - [x] Catat perangkat target: Synology DS923+ dengan DSM 7.2.2.
-- [ ] Verifikasi langsung paket PHP 7.4, Web Station, MariaDB 10, dan ekstensi yang tersedia pada DS923+.
-- [ ] Verifikasi lingkungan server web dan konfigurasi PHP 7.4 pada Synology.
+- [x] Catat konfirmasi pengguna bahwa Web Station, MariaDB, dan PHP 7.4 sudah dipasang.
+- [x] Catat bahwa database telah diatur melalui phpMyAdmin pada `127.0.0.1`.
+- [ ] Verifikasi profil PHP yang dipakai situs Web Monitor serta ekstensi aktif: PDO, PDO MySQL, cURL, dan OpenSSL.
+- [ ] Uji koneksi Web Monitor ke database di `127.0.0.1`; pastikan nama database dan hak akun aplikasi benar.
 - [ ] Rancang dan verifikasi wizard pemasangan berbasis GUI; tidak boleh membutuhkan CLI pada sisi pengguna.
-- [ ] Wizard memeriksa prasyarat, menguji kredensial MariaDB, membuat database/tabel dan akun database aplikasi bila kredensial memiliki hak yang diperlukan, lalu menyimpan hanya kredensial aplikasi.
+- [ ] Wizard memeriksa prasyarat dan koneksi MariaDB. Karena database sudah diatur melalui phpMyAdmin, tentukan dari pemeriksaan apakah wizard perlu membuat database/tabel atau cukup memvalidasi database dan akun yang sudah ada. Jangan menyimpan kredensial administratif.
 - [ ] Wizard membuat akun administrator aplikasi pertama setelah koneksi database berhasil, lalu mengunci pemasangan ulang.
 - [ ] Verifikasi panduan pemasangan pada lingkungan Synology yang bersih.
 - [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
@@ -90,7 +92,7 @@ Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keama
 ## Persyaratan instalasi dan akun (rancangan, belum diimplementasikan)
 
 - Seluruh langkah pemasangan dan pengaturan untuk pengguna dilakukan lewat GUI DSM dan wizard browser; tidak mengharuskan SSH, terminal, atau perintah CLI.
-- Target DSM yang diketahui: 7.2.2. Model NAS masih perlu dikonfirmasi karena ketersediaan paket bisa berbeda menurut model.
+- Target DSM yang diketahui: 7.2.2 pada Synology DS923+. Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang; database sudah diatur melalui phpMyAdmin pada `127.0.0.1`. Versi/profil PHP aktif, ekstensi, nama database, hak akun aplikasi, dan koneksi dari aplikasi masih perlu diverifikasi.
 - Wizard memeriksa PHP 7.4, PDO, PDO MySQL, cURL, OpenSSL, sesi, izin direktori konfigurasi, dan koneksi MariaDB sebelum melanjutkan.
 - Untuk pembuatan database otomatis, wizard meminta kredensial MariaDB yang memang memiliki izin membuat database dan pengguna/grant. Kredensial administratif hanya digunakan selama langkah instalasi, tidak disimpan dalam konfigurasi aplikasi dan tidak ditampilkan kembali.
 - Wizard membuat database khusus dan akun MariaDB khusus aplikasi dengan hak minimum pada database tersebut. Jika kredensial yang diberikan tidak memiliki hak yang diperlukan, wizard berhenti dengan pesan jelas dan menyediakan jalur GUI alternatif; tidak mencoba melewati hak akses.
