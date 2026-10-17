@@ -7,7 +7,7 @@ Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaa
 ## Fitur yang sudah ada
 
 - Tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
-- Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan. Mode `Situs lokal` diatur per situs; default tidak dicentang untuk situs publik.
+- Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan. Mode publik memakai DNS-over-HTTPS Cloudflare dan mengunci koneksi ke IP publik hasil resolusi; mode `Situs lokal` diatur per situs.
 - Penyimpanan hasil pemeriksaan dan tampilan hingga 20 hasil terbaru per situs.
 - Kueri basis data terparameterisasi, escaping keluaran HTML, dan token CSRF untuk formulir POST.
 - Wizard `setup.php` menguji koneksi MariaDB, membuat tabel secara otomatis, menyimpan konfigurasi, dan membuat administrator pertama.
@@ -15,7 +15,7 @@ Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaa
 - Skema MySQL/MariaDB di `database/schema.sql` dan contoh konfigurasi di `pengaturan.contoh.php`.
 - CI GitHub Actions yang memeriksa sintaks PHP 7.4 dan penerapan skema pada MySQL 8.0.
 
-**Batasan keamanan:** opsi target lokal/intranet memperluas akses yang dapat dilakukan server dan meningkatkan risiko SSRF. Aktifkan hanya jika diperlukan dan batasi aplikasi ke jaringan tepercaya. Validasi URL saat ini hanya mitigasi SSRF awal. Resolusi DNS belum dikunci ke alamat IP yang sama saat koneksi, sehingga risiko DNS rebinding belum tertutup. Login dasar sudah ada, tetapi belum menggantikan audit keamanan. Jangan mengekspos aplikasi ke internet.
+**Batasan keamanan:** opsi target lokal/intranet memperluas akses yang dapat dilakukan server dan meningkatkan risiko SSRF. Aktifkan hanya jika diperlukan dan batasi aplikasi ke jaringan tepercaya. Validasi URL saat ini hanya mitigasi SSRF awal. Mode publik kini memakai DNS-over-HTTPS dan mem-pin IP yang diperiksa, tetapi perubahan ini tetap perlu ditinjau dan diuji pada runtime target. Validasi SSRF menyeluruh tetap menjadi blocker. Login dasar sudah ada, tetapi belum menggantikan audit keamanan. Jangan mengekspos aplikasi ke internet.
 
 ## Persyaratan
 
