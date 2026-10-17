@@ -7,7 +7,7 @@ Aplikasi PHP 7.4 untuk mengelola daftar situs HTTP/HTTPS, menjalankan pemeriksaa
 ## Fitur yang sudah ada
 
 - Tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
-- Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan. Target lokal/intranet dapat diizinkan secara eksplisit.
+- Pemeriksaan HTTP/HTTPS manual melalui cURL dengan batas waktu, verifikasi TLS, dan pengalihan dimatikan. Mode `Situs lokal` diatur per situs; default tidak dicentang untuk situs publik.
 - Penyimpanan hasil pemeriksaan dan tampilan hingga 20 hasil terbaru per situs.
 - Kueri basis data terparameterisasi, escaping keluaran HTML, dan token CSRF untuk formulir POST.
 - Wizard `setup.php` menguji koneksi MariaDB, membuat tabel secara otomatis, menyimpan konfigurasi, dan membuat administrator pertama.
@@ -39,7 +39,7 @@ Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada DS9
 3. Buka `setup.php` dari browser di perangkat lokal atau jaringan privat.
 4. Masukkan host `127.0.0.1`, nama database yang sudah dibuat, dan kredensial MariaDB yang memiliki hak membuat tabel pada database itu. Tidak perlu membuka phpMyAdmin atau membuat database lagi.
 5. Pilih nama pengguna dan kata sandi administrator Web Monitor (minimal 12 karakter), lalu jalankan instalasi. Wizard menguji koneksi, membuat tabel situs/riwayat/akun, membuat administrator, dan menyimpan konfigurasi.
-6. Opsional: centang **Izinkan target intranet, hostname lokal, dan IP privat** bila ingin memantau layanan internal. Pilihan ini disimpan di `pengaturan.php`; default-nya nonaktif.
+6. Setelah masuk, saat menambahkan atau mengubah situs, centang **Situs lokal** hanya untuk target intranet/hostname lokal. Situs publik biarkan tidak dicentang.
 7. Setelah berhasil, wizard terkunci karena berkas `pengaturan.php` sudah dibuat. Masuk melalui `index.php`.
 
 Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Jika instalasi sudah selesai, pengaturan `izinkan_alamat_lokal` dapat diubah melalui File Station dengan menyunting `pengaturan.php` dan menetapkan nilainya ke `true` atau `false` (tanpa mengubah kredensial lain). Jika koneksi atau izin folder gagal, wizard berhenti dengan pesan aman; tidak mencoba melewati hak MariaDB. Kredensial yang dimasukkan menjadi kredensial koneksi aplikasi yang disimpan di `pengaturan.php`, jadi gunakan akun database khusus berhak minimum, bukan root.
@@ -53,6 +53,8 @@ Wizard hanya menerima akses loopback/LAN privat dan menggunakan token CSRF. Jika
 7. Jika hak database tidak cukup, tampilkan instruksi yang dapat dilakukan lewat GUI DSM/phpMyAdmin; jangan meminta CLI atau mencoba melewati hak akses.
 
 Jangan gunakan akun root MariaDB untuk koneksi harian aplikasi. Jangan gunakan kata sandi default. Wizard harus dibatasi ke akses lokal/tepercaya, memakai perlindungan CSRF, dan menutup dirinya setelah instalasi sukses.
+
+Kolom `situs_lokal` ditambahkan otomatis pada instalasi lama saat dashboard dibuka; situs yang sudah ada tetap dianggap situs publik sampai opsi lokal dicentang saat diedit.
 
 Wizard otomatis telah tersedia, tetapi pemasangan belum dianggap terverifikasi sampai uji pada NAS target atau lingkungan setara berhasil. Jangan gunakan data produksi sebelum prosedur itu berhasil diuji.
 
