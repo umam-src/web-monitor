@@ -28,13 +28,13 @@ Pertahankan PHP 7.4 selama Synology target masih mendukungnya. PHP 7.4 sudah tid
 
 Target perangkat: **Synology DS923+ dengan DSM 7.2.2**. Target penggunaan adalah pemasangan dan konfigurasi **tanpa CLI pada sisi pengguna**. Semua langkah harus dapat dilakukan melalui Package Center, Web Station, File Station/SMB, dan browser; tidak memerlukan SSH atau terminal.
 
-Dokumentasi resmi Synology untuk DSM 7.2 mencantumkan PHP 7.4 sebagai backend Web Station yang didukung dan menjelaskan pengaturan ekstensi lewat GUI. Ketersediaan aktual tetap perlu diperiksa pada model NAS yang digunakan. [Spesifikasi Web Station DSM 7.2](https://www.synology.com/en-au/dsm/7.2/software_spec/web_station) · [Pengaturan profil PHP](https://kb.synology.com/en-global/DSM/help/WebStation/application_webserv_php).
+Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada DS923+ dengan DSM 7.2.2, serta database sudah diatur melalui phpMyAdmin pada `127.0.0.1`. Profil PHP yang benar-benar dipakai situs, ekstensi aktif, hak akun database, dan koneksi dari aplikasi tetap harus diuji. Dokumentasi resmi Synology untuk DSM 7.2 mencantumkan PHP 7.4 sebagai backend Web Station yang didukung dan menjelaskan pengaturan ekstensi lewat GUI. [Spesifikasi Web Station DSM 7.2](https://www.synology.com/en-au/dsm/7.2/software_spec/web_station) · [Pengaturan profil PHP](https://kb.synology.com/en-global/DSM/help/WebStation/application_webserv_php).
 
 ### Rancangan wizard instalasi (belum diimplementasikan)
 
-1. Periksa versi PHP, ekstensi wajib, izin direktori, dan koneksi MariaDB.
-2. Minta kredensial MariaDB yang memiliki izin membuat database dan akun database. Kredensial administratif hanya dipakai selama pemasangan dan tidak disimpan.
-3. Buat database/tabel dan akun MariaDB khusus aplikasi dengan hak minimum.
+1. Periksa profil PHP yang dipakai situs, ekstensi wajib, izin direktori, dan koneksi MariaDB.
+2. Uji apakah database dan akun aplikasi yang sudah dibuat melalui phpMyAdmin dapat digunakan oleh Web Monitor.
+3. Jika database atau akun belum siap, sediakan langkah GUI untuk membuat database/tabel dan akun MariaDB khusus aplikasi dengan hak minimum. Kredensial administratif hanya dipakai selama pemasangan dan tidak disimpan.
 4. Simpan hanya konfigurasi akun database aplikasi pada berkas yang dilindungi, tidak masuk Git, dan tidak dapat diunduh melalui web.
 5. Minta pengguna membuat akun administrator Web Monitor pertama; kata sandi disimpan sebagai hash.
 6. Tandai instalasi selesai dan kunci wizard agar tidak dapat digunakan ulang untuk membuat akun atau mengubah konfigurasi.
@@ -62,4 +62,4 @@ Langkah ini belum dianggap sebagai prosedur pemasangan terverifikasi. Gate Fase 
 - [CONTRIBUTING.md](CONTRIBUTING.md): aturan kerja, pengujian, dan rilis.
 - [GLOSARIUM.md](GLOSARIUM.md): istilah baku dan penamaan.
 
-Fase 0 masih terblokir sampai detail Synology target, kebutuhan paket, pemeriksaan rahasia repositori, dan pemasangan bersih diverifikasi. Uji runtime PHP 7.4 dan penyelesaian mitigasi SSRF juga wajib sebelum Fase 1 diterima.
+Fase 0 masih terblokir sampai profil PHP dan ekstensi aktif, koneksi Web Monitor ke MariaDB di `127.0.0.1`, hak akun database, pemeriksaan rahasia repositori, dan pemasangan/pengujian bersih diverifikasi. Uji runtime PHP 7.4 dan penyelesaian mitigasi SSRF juga wajib sebelum Fase 1 diterima.
