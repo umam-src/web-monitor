@@ -15,25 +15,47 @@ function aman($nilai)
 
 function urlTargetValid($url, $izinkanLokal = false)
 {
-    if (!is_string($url) || strlen($url) > 2048 || !filter_var($url, FILTER_VALIDATE_URL)) {
+    if (!is_string($url) || $url === '' || strlen($url) > 2048 ||
+        preg_match('/[\\x00-\\x20\\x7f]/', $url)) {
         return false;
     }
     $bagian = parse_url($url);
     if (!$bagian || !isset($bagian['scheme'], $bagian['host']) ||
         !in_array(strtolower($bagian['scheme']), array('http', 'https'), true) ||
-        isset($bagian['user']) || isset($bagian['pass'])) {
+        isset($bagian['user']) || isset($bagian['pass']) ||
+        (isset($bagian['port']) && ($bagian['port'] < 1 || $bagian['port'] > 65535))) {
         return false;
     }
     $host = trim($bagian['host'], '[]');
-    $filterFlags = $izinkanLokal ? FILTER_FLAG_NO_RES_RANGE : (FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     if (filter_var($host, FILTER_VALIDATE_IP)) {
-        return (bool) filter_var($host, FILTER_VALIDATE_IP, $filterFlags);
+        if ($izinkanLokal) {
+            return true;
+        }
+        return (bool) filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     }
-    if (!$izinkanLokal && (strpos($host, '.') === false || preg_match('/\\.local$/i', $host))) {
+
+    // Mode lokal menerima hostname intranet, termasuk nama satu label dan domain AD.
+    // Dalam mode publik, pertahankan syarat hostname publik dan resolusi ke IP publik.
+    if ($izinkanLokal) {
+        if (strlen($host) > 253 || !preg_match('/^[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?$/', $host) ||
+            strpos($host, '..') !== false) {
+            return false;
+        }
+        foreach (explode('.', $host) as $label) {
+            if ($label === '' || strlen($label) > 63 ||
+                !preg_match('/^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$/', $label)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (!filter_var($url, FILTER_VALIDATE_URL) ||
+        strpos($host, '.') === false || preg_match('/\\.local$/i', $host)) {
         return false;
     }
     $ip = gethostbyname($host);
-    return $ip !== $host && (bool) filter_var($ip, FILTER_VALIDATE_IP, $filterFlags);
+    return $ip !== $host && (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
 }
 
 function tokenValid()
