@@ -14,9 +14,10 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 - [x] Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada NAS target; pemasangan paket belum diverifikasi secara independen.
 - [ ] Verifikasi versi/profil PHP aktif, koneksi aplikasi ke MariaDB di `127.0.0.1`, serta ekstensi yang diperlukan pada DS923+.
 - [ ] Verifikasi ekstensi PHP yang aktif: PDO, PDO MySQL, cURL, dan OpenSSL.
-- [ ] Sediakan wizard pemasangan browser tanpa CLI pada sisi pengguna.
-- [ ] Periksa melalui phpMyAdmin apakah database dan akun aplikasi yang dibutuhkan sudah ada; uji koneksi Web Monitor ke `127.0.0.1`. Jika belum siap, uji wizard membuat database/tabel dan akun database aplikasi dengan kredensial berizin; jangan simpan kredensial administratif.
-- [ ] Uji wizard membuat administrator aplikasi pertama dan menutup installer setelah selesai.
+- [x] Tambahkan wizard browser `setup.php` tanpa CLI untuk menguji koneksi ke database yang sudah ada dan membuat tabel otomatis.
+- [x] Tambahkan pembuatan administrator pertama dan penguncian wizard setelah konfigurasi tersimpan.
+- [x] Tambahkan login/logout dasar dan proteksi dashboard berdasarkan sesi.
+- [ ] Uji hak membuat tabel, koneksi, pembuatan admin, login/logout, dan penguncian wizard pada PHP 7.4/MariaDB target.
 - [ ] Jalankan panduan pemasangan dari kondisi bersih pada lingkungan target atau lingkungan setara yang didokumentasikan.
 - [x] CI memeriksa sintaks PHP 7.4 dan penerapan skema pada MySQL 8.0.
 - [ ] Pastikan CI terbaru yang relevan selesai sukses setelah perubahan kode terkait.
@@ -26,13 +27,13 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 
 **Gate Fase 0 terbuka jika:** semua kotak di atas ditutup dengan bukti yang dapat diperiksa, wizard instalasi GUI tanpa CLI berhasil membuat database dan akun pertama dengan hak minimum, panduan instalasi berhasil diikuti, dan hasil dicatat di log kerja. Setelah itu Fase 0 dapat diterima dan rilis 0.1.0 boleh dipertimbangkan.
 
-## Persyaratan rancangan installer DSM 7.2.2
+## Perilaku installer DSM 7.2.2 yang perlu diverifikasi
 
 - Pengguna tidak perlu SSH, terminal, atau CLI untuk memasang dan mengatur aplikasi.
 - Installer berjalan sebagai wizard web, tetapi hanya aktif saat instalasi awal dan hanya melalui akses lokal/tepercaya.
-- Pembuatan database otomatis membutuhkan kredensial MariaDB yang memiliki hak membuat database dan akun/grant. Kredensial administratif tidak boleh disimpan; buat akun database khusus aplikasi dengan hak minimum.
+- Database dibuat sebelumnya melalui GUI; installer membuat tabel otomatis di dalam database yang dipilih. Akun MariaDB harus memiliki hak membuat tabel dan baca/tulis pada database itu. Kredensial runtime yang disimpan harus milik akun aplikasi berhak minimum, bukan root.
 - Jika hak tidak cukup, installer harus berhenti dengan instruksi GUI yang jelas, bukan meminta pengguna menaikkan hak secara permanen atau mencoba bypass.
-- Administrator aplikasi dibuat melalui formulir pertama kali setelah database siap; kata sandi disimpan sebagai hash; setup dikunci setelah berhasil.
+- Administrator aplikasi dibuat melalui formulir pertama kali setelah tabel siap; kata sandi disimpan sebagai hash; setup dikunci setelah konfigurasi berhasil disimpan. Login dasar kini membatasi akses dashboard.
 - File konfigurasi berisi kredensial database aplikasi harus dilindungi, tidak berada di Git, tidak dapat diunduh, dan tidak ditampilkan dalam halaman diagnostik.
 - Pengaturan ekstensi PHP dilakukan lewat Web Station GUI. Dokumentasi resmi Synology untuk DSM 7.2 menyebut PHP 7.4 sebagai backend yang didukung, tetapi ketersediaan aktual harus dikonfirmasi pada model NAS target. Referensi: https://www.synology.com/en-au/dsm/7.2/software_spec/web_station dan https://kb.synology.com/en-global/DSM/help/WebStation/application_webserv_php.
 
