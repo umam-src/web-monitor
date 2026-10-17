@@ -10,8 +10,8 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 
 ## Blocker Fase 0 — wajib ditutup sebelum Fase 1 diterima
 
-- [x] Catat versi DSM target: DSM 7.2.2.
-- [ ] Catat model perangkat Synology dan pastikan paket yang dibutuhkan tersedia pada model tersebut.
+- [x] Catat perangkat target: Synology DS923+ dengan DSM 7.2.2.
+- [ ] Verifikasi langsung ketersediaan Web Station, PHP 7.4, MariaDB 10, serta ekstensi yang diperlukan pada DS923+.
 - [ ] Verifikasi paket server web, PHP 7.4, dan ekstensi yang dibutuhkan: PDO, PDO MySQL, cURL, dan OpenSSL.
 - [ ] Sediakan wizard pemasangan browser tanpa CLI pada sisi pengguna.
 - [ ] Uji wizard membuat database/tabel dan akun database aplikasi dengan kredensial MariaDB berizin; jangan simpan kredensial administratif.
