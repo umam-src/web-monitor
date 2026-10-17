@@ -8,10 +8,11 @@
 - Gunakan bahasa Indonesia dan istilah baku dari GLOSARIUM.md.
 - Jangan menyimpan kata sandi, token, atau data sensitif di repositori maupun log.
 
-## Lingkungan awal
-- PHP 7.4, PDO, PDO MySQL, cURL, OpenSSL.
-- MySQL atau MariaDB, server web, dan cron.
-- PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisolasi dan rencanakan peningkatan ke versi yang masih didukung.
+## Lingkungan dan kompatibilitas
+- Target runtime adalah PHP 7.4 dengan PDO, PDO MySQL, cURL, dan OpenSSL, sesuai paket yang tersedia pada lingkungan Synology target.
+- Pertahankan kompatibilitas PHP 7.4 selama lingkungan Synology target masih mendukungnya. Jangan memigrasikan versi PHP hanya karena dukungan upstream telah berakhir.
+- PHP 7.4 sudah tidak mendapat dukungan keamanan resmi upstream. Mitigasi risiko dengan membatasi akses aplikasi, menjaga dependensi tetap diperbarui sejauh kompatibel, dan melakukan pengujian keamanan. Jangan mengekspos aplikasi ke internet sebelum kontrol keamanan wajib selesai.
+- Jika Synology target tidak lagi mendukung PHP 7.4, buat rencana migrasi terpisah berdasarkan versi PHP yang didukung saat itu; uji kode, ekstensi, dan dependensi sebelum mengubah persyaratan.
 
 ## Alur kerja
 1. Baca README.md, TODO.md, GLOSARIUM.md, dan CHANGELOG.md.
