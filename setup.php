@@ -1,5 +1,11 @@
 <?php
 // Wizard instalasi Web Monitor untuk PHP 7.4. Hanya untuk akses lokal/LAN.
+ini_set('session.use_strict_mode', '1');
+session_set_cookie_params(array(
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+));
 session_start();
 
 function setupAman($nilai)
@@ -69,6 +75,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if (strlen($passwordAdmin) < 12) {
             throw new InvalidArgumentException('Kata sandi administrator minimal 12 karakter.');
+        }
+        if (PHP_VERSION_ID < 70400) {
+            throw new RuntimeException('Web Monitor membutuhkan PHP 7.4 atau lebih baru.');
+        }
+        $ekstensiWajib = array('pdo', 'pdo_mysql', 'curl', 'openssl');
+        $ekstensiHilang = array();
+        foreach ($ekstensiWajib as $ekstensi) {
+            if (!extension_loaded($ekstensi)) {
+                $ekstensiHilang[] = $ekstensi;
+            }
+        }
+        if ($ekstensiHilang) {
+            throw new RuntimeException('Aktifkan ekstensi PHP berikut pada profil situs melalui Web Station: ' . implode(', ', $ekstensiHilang) . '.');
         }
         if (!extension_loaded('pdo_mysql')) {
             throw new RuntimeException('Ekstensi PDO MySQL belum aktif pada profil PHP situs ini. Aktifkan melalui Web Station, lalu muat ulang wizard.');
