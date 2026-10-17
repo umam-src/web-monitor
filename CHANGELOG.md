@@ -9,6 +9,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 
 ### Ditambahkan
 - Pemeriksaan mode publik menggunakan DNS-over-HTTPS Cloudflare dan mengunci koneksi cURL ke alamat IPv4 publik yang divalidasi, tanpa bergantung pada DNS internal untuk target.
+- Kegagalan resolusi DNS publik dicatat sebagai hasil gangguan dalam riwayat, baik pada pemeriksaan satu situs maupun pemeriksaan semua situs.
 - Opsi `Situs lokal` per situs pada formulir tambah/ubah; nilainya disimpan di database dan kolom baru dimigrasikan otomatis pada instalasi lama.
 - Dialog tambah/ubah situs dengan ukuran berbasis viewport, batas minimum/maksimum, dan area isi yang dapat digulir.
 - Wizard browser `setup.php` menguji koneksi ke database yang sudah ada dan membuat tabel situs, riwayat, serta akun administrator secara otomatis tanpa phpMyAdmin.
