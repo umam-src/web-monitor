@@ -22,17 +22,17 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
 - [x] Tambahkan uji penerapan skema pada MySQL 8.0 di CI.
 
-Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git.
+Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. Run CI yang tercatat pada 2026-10-17 berhasil untuk versi sebelum implementasi Fase 1; perubahan Fase 1 harus diverifikasi oleh run baru.
 
 ## Fase 1 — Pengelolaan situs dan pemeriksaan manual (target 0.2.0)
-- [ ] Tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
-- [ ] Validasi alamat HTTP/HTTPS.
-- [ ] Periksa situs dengan batas waktu koneksi dan total.
-- [ ] Simpan kode HTTP, waktu respons, waktu pemeriksaan, status, dan ringkasan kesalahan.
-- [ ] Tampilkan hasil terakhir dan riwayat dasar.
-- [ ] Uji respons sukses, 4xx/5xx, DNS gagal, batas waktu, dan TLS.
+- [x] Implementasikan tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
+- [x] Validasi awal alamat HTTP/HTTPS dan tolak alamat IP privat/lokal yang terdeteksi.
+- [x] Tambahkan pemeriksaan manual dengan batas waktu koneksi 5 detik dan total 15 detik; pengalihan tidak diikuti.
+- [x] Simpan kode HTTP, waktu respons, waktu pemeriksaan, status, dan ringkasan kesalahan.
+- [ ] Tampilkan riwayat pemeriksaan, bukan hanya hasil terakhir.
+- [ ] Uji respons sukses, 4xx/5xx, DNS gagal, batas waktu, dan TLS pada runtime PHP 7.4.
 
-Kriteria penerimaan: pengguna bisa mengelola situs dari antarmuka; pemeriksaan menyimpan hasil; kegagalan koneksi dibedakan dari kode HTTP; keluaran dan kueri ditangani dengan aman.
+Kriteria penerimaan: pengguna bisa mengelola situs dari antarmuka; pemeriksaan menyimpan hasil; kegagalan koneksi dibedakan dari kode HTTP; keluaran dan kueri ditangani dengan aman. Implementasi baru belum dianggap terverifikasi sampai CI dan uji runtime lulus.
 
 ## Fase 2 — Pemantauan terjadwal dan riwayat (target 0.3.0)
 - [ ] Jalankan pemeriksaan melalui cron dengan interval per situs.
@@ -59,9 +59,11 @@ Kriteria penerimaan: status memiliki alasan yang dapat dijelaskan; satu kegagala
 Kriteria penerimaan: pemberitahuan mengikuti aturan status; kegagalan kanal tidak menghentikan pemeriksaan.
 
 ## Fase 5 — Keamanan dan kesiapan penggunaan (target 0.6.0)
-- [ ] Tambahkan autentikasi, pengelolaan sesi, dan perlindungan CSRF.
-- [ ] Cegah pemeriksa mengakses jaringan internal atau alamat khusus; validasi DNS dan setiap pengalihan.
-- [ ] Batasi waktu, ukuran respons, pengalihan, dan frekuensi pemeriksaan.
+- [ ] Tambahkan autentikasi dan pengelolaan sesi.
+- [x] Terapkan token CSRF untuk formulir POST.
+- [ ] Cegah pemeriksa mengakses jaringan internal atau alamat khusus secara menyeluruh; validasi semua alamat hasil DNS dan setiap pengalihan.
+- [x] Tetapkan batas waktu pemeriksaan dan matikan pengalihan otomatis.
+- [ ] Batasi ukuran respons dan frekuensi pemeriksaan.
 - [ ] Uji akses tanpa izin, injeksi SQL, XSS, CSRF, dan validasi alamat.
 - [ ] Uji pemasangan, migrasi skema, pencadangan, dan pemulihan.
 - [ ] Siapkan CI dan panduan rilis.
@@ -78,6 +80,7 @@ Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keama
 
 ## Risiko dan keputusan terbuka
 - Pertahankan PHP 7.4 selama Synology target masih mendukungnya. PHP 7.4 tidak lagi mendapat dukungan keamanan upstream, jadi mitigasi risikonya dan evaluasi ulang bila dukungan Synology berakhir.
-- Runtime PHP dan integrasi basis data belum diuji.
+- Runtime PHP dan integrasi basis data belum diuji pada lingkungan Synology.
+- Pemeriksaan URL saat ini adalah mitigasi awal SSRF, bukan pengganti validasi seluruh alamat DNS/redirect yang harus diselesaikan sebelum penggunaan publik.
 - Belum diputuskan apakah aplikasi mendukung banyak akun.
 - Kanal pemberitahuan belum dipilih.
