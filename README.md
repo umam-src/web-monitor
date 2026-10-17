@@ -9,11 +9,12 @@ Aplikasi web PHP 7.4 untuk memantau ketersediaan situs melalui HTTP/HTTPS, menyi
 - Skema awal basis data pada database/schema.sql.
 - Contoh pengaturan lokal pada pengaturan.contoh.php.
 - Roadmap, catatan perubahan, panduan kontribusi, dan glosarium.
+- CI dasar untuk sintaks PHP 7.4 dan penerapan skema basis data.
 
 ## Persyaratan awal
 PHP 7.4, PDO, PDO MySQL, MySQL/MariaDB, server web, dan cron untuk tahap pemeriksaan terjadwal.
 
-Peringatan: PHP 7.4 sudah tidak mendapat dukungan keamanan resmi. Gunakan lingkungan terisolasi untuk pengembangan dan rencanakan peningkatan ke versi yang masih didukung sebelum penggunaan publik. Dasbor belum memiliki autentikasi; jangan publikasikan ke internet.
+Kompatibilitas: pertahankan PHP 7.4 selama Synology target masih mendukungnya. PHP 7.4 sudah tidak mendapat dukungan keamanan resmi upstream, sehingga akses harus dibatasi dan risiko keamanan dimitigasi. Dasbor belum memiliki autentikasi; jangan publikasikan ke internet.
 
 ## Memulai
 1. Buat basis data MySQL/MariaDB bernama web_monitor.
