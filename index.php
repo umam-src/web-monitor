@@ -37,7 +37,7 @@ function urlTargetValid($url, $izinkanLokal = false)
     // Mode lokal menerima hostname intranet, termasuk nama satu label dan domain AD.
     // Dalam mode publik, pertahankan syarat hostname publik dan resolusi ke IP publik.
     if ($izinkanLokal) {
-        if (strlen($host) > 253 || !preg_match('/^[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?$/', $host) ||
+        if (preg_match('/^[0-9.]+$/', $host) || strlen($host) > 253 || !preg_match('/^[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?$/', $host) ||
             strpos($host, '..') !== false) {
             return false;
         }
