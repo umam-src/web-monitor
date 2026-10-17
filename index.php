@@ -166,7 +166,8 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_
                     throw new InvalidArgumentException('Situs tidak ditemukan atau sedang dinonaktifkan.');
                 }
                 // Validasi ulang tepat sebelum permintaan; pengalihan dimatikan untuk mengurangi risiko SSRF.
-                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;\n                if (!urlTargetValid($target['alamat_url'], $izinkanLokal)) {
+                $izinkanLokal = isset($pengaturan['izinkan_alamat_lokal']) && $pengaturan['izinkan_alamat_lokal'] === true;
+                if (!urlTargetValid($target['alamat_url'], $izinkanLokal)) {
                     throw new InvalidArgumentException('Alamat tidak lolos validasi keamanan saat pemeriksaan.');
                 }
                 if (!function_exists('curl_init')) {
