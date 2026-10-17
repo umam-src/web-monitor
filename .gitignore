@@ -1,0 +1,13 @@
+# Konfigurasi dan rahasia lokal
+config.php
+.env
+
+# Log dan cadangan
+*.log
+*.sql.bak
+
+# Editor dan sistem operasi
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
