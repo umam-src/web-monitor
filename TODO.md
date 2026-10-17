@@ -16,10 +16,11 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Buat dokumentasi utama dan glosarium.
 - [x] Buat kerangka dasbor PHP dan skema basis data awal.
 - [x] Buat contoh pengaturan lokal dan .gitignore.
-- [ ] Tetapkan lingkungan PHP, ekstensi, basis data, dan server web.
-- [ ] Verifikasi panduan pemasangan pada lingkungan bersih.
-- [ ] Tambahkan pemeriksaan sintaks PHP dan pengujian otomatis di CI.
-- [ ] Uji skema pada MySQL/MariaDB.
+- [ ] Catat model/DSM Synology target serta paket PHP dan ekstensi yang tersedia.
+- [ ] Verifikasi lingkungan server web dan konfigurasi PHP 7.4 pada Synology.
+- [ ] Verifikasi panduan pemasangan pada lingkungan Synology yang bersih.
+- [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
+- [x] Tambahkan uji penerapan skema pada MySQL 8.0 di CI.
 
 Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git.
 
@@ -64,9 +65,8 @@ Kriteria penerimaan: pemberitahuan mengikuti aturan status; kegagalan kanal tida
 - [ ] Uji akses tanpa izin, injeksi SQL, XSS, CSRF, dan validasi alamat.
 - [ ] Uji pemasangan, migrasi skema, pencadangan, dan pemulihan.
 - [ ] Siapkan CI dan panduan rilis.
-- [ ] Rencanakan peningkatan dari PHP 7.4 ke versi yang masih mendapat dukungan keamanan.
 
-Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keamanan; pengujian lulus; cadangan/pemulihan teruji; status dukungan PHP dinyatakan jelas.
+Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keamanan; pengujian lulus; cadangan/pemulihan teruji; kompatibilitas PHP 7.4 pada Synology target terverifikasi dan risiko dukungan upstream dijelaskan.
 
 ## Setelah 0.6.0 — berdasarkan kebutuhan
 - [ ] Banyak lokasi pemeriksaan.
@@ -77,7 +77,7 @@ Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keama
 - [ ] Banyak akun/organisasi.
 
 ## Risiko dan keputusan terbuka
-- PHP 7.4 sudah tidak mendapat dukungan keamanan resmi; gunakan lingkungan terisolasi selama pengembangan dan rencanakan peningkatan.
+- Pertahankan PHP 7.4 selama Synology target masih mendukungnya. PHP 7.4 tidak lagi mendapat dukungan keamanan upstream, jadi mitigasi risikonya dan evaluasi ulang bila dukungan Synology berakhir.
 - Runtime PHP dan integrasi basis data belum diuji.
 - Belum diputuskan apakah aplikasi mendukung banyak akun.
 - Kanal pemberitahuan belum dipilih.
