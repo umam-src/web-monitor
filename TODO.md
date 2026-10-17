@@ -18,13 +18,17 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Buat dokumentasi utama dan glosarium.
 - [x] Buat kerangka dasbor PHP dan skema basis data awal.
 - [x] Buat contoh pengaturan lokal dan .gitignore.
-- [ ] Catat model/DSM Synology target serta paket PHP dan ekstensi yang tersedia.
+- [x] Catat versi DSM target: DSM 7.2.2.
+- [ ] Catat model Synology dan verifikasi paket PHP 7.4 serta ekstensi yang tersedia pada model tersebut.
 - [ ] Verifikasi lingkungan server web dan konfigurasi PHP 7.4 pada Synology.
+- [ ] Rancang dan verifikasi wizard pemasangan berbasis GUI; tidak boleh membutuhkan CLI pada sisi pengguna.
+- [ ] Wizard memeriksa prasyarat, menguji kredensial MariaDB, membuat database/tabel dan akun database aplikasi bila kredensial memiliki hak yang diperlukan, lalu menyimpan hanya kredensial aplikasi.
+- [ ] Wizard membuat akun administrator aplikasi pertama setelah koneksi database berhasil, lalu mengunci pemasangan ulang.
 - [ ] Verifikasi panduan pemasangan pada lingkungan Synology yang bersih.
 - [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
 - [x] Tambahkan uji penerapan skema pada MySQL 8.0 di CI.
 
-Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. CI PHP 7.4 dan penerapan skema MySQL 8.0 berhasil pada commit implementasi Fase 1; perubahan lanjutan tetap harus diverifikasi oleh run baru.
+Kriteria penerimaan: pemasangan dari browser/GUI tanpa CLI, database dan tabel dibuat otomatis dengan hak akses yang jelas, akun administrator pertama dibuat setelah instalasi, wizard terkunci setelah selesai, instalasi dapat diulang dengan aman, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. CI PHP 7.4 dan penerapan skema MySQL 8.0 berhasil pada commit implementasi Fase 1; perubahan lanjutan tetap harus diverifikasi oleh run baru.
 
 ## Fase 1 — Pengelolaan situs dan pemeriksaan manual (target 0.2.0; belum diterima, menunggu gate Fase 0)
 - [x] Implementasikan tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
@@ -81,6 +85,18 @@ Kriteria penerimaan: jangan publikasikan tanpa autentikasi dan pemeriksaan keama
 - [ ] Pemantauan masa berlaku sertifikat TLS.
 - [ ] Laporan dan ekspor.
 - [ ] Banyak akun/organisasi.
+
+## Persyaratan instalasi dan akun (rancangan, belum diimplementasikan)
+
+- Seluruh langkah pemasangan dan pengaturan untuk pengguna dilakukan lewat GUI DSM dan wizard browser; tidak mengharuskan SSH, terminal, atau perintah CLI.
+- Target DSM yang diketahui: 7.2.2. Model NAS masih perlu dikonfirmasi karena ketersediaan paket bisa berbeda menurut model.
+- Wizard memeriksa PHP 7.4, PDO, PDO MySQL, cURL, OpenSSL, sesi, izin direktori konfigurasi, dan koneksi MariaDB sebelum melanjutkan.
+- Untuk pembuatan database otomatis, wizard meminta kredensial MariaDB yang memang memiliki izin membuat database dan pengguna/grant. Kredensial administratif hanya digunakan selama langkah instalasi, tidak disimpan dalam konfigurasi aplikasi dan tidak ditampilkan kembali.
+- Wizard membuat database khusus dan akun MariaDB khusus aplikasi dengan hak minimum pada database tersebut. Jika kredensial yang diberikan tidak memiliki hak yang diperlukan, wizard berhenti dengan pesan jelas dan menyediakan jalur GUI alternatif; tidak mencoba melewati hak akses.
+- Setelah database siap, wizard meminta nama pengguna dan kata sandi administrator Web Monitor, menyimpan hash kata sandi yang kuat, lalu menutup endpoint installer dengan penanda instalasi selesai.
+- Jangan menggunakan akun root MariaDB untuk koneksi harian aplikasi. Jangan membuat kredensial default, kata sandi bawaan, atau endpoint setup yang tetap terbuka.
+- Kredensial database aplikasi disimpan dalam berkas konfigurasi di luar Git dan tidak boleh dapat diunduh atau disajikan sebagai teks melalui web. Izin berkas harus dibatasi ke akun layanan yang menjalankan PHP sejauh dapat dilakukan melalui GUI DSM.
+- Semua langkah pemasangan dapat dilakukan lewat File Station, Package Center, Web Station, dan browser. Pengunggahan/penempatan berkas dapat memakai File Station atau SMB; tidak ada perintah terminal dalam petunjuk pengguna.
 
 ## Risiko dan keputusan terbuka
 - Pertahankan PHP 7.4 selama Synology target masih mendukungnya. PHP 7.4 tidak lagi mendapat dukungan keamanan upstream, jadi mitigasi risikonya dan evaluasi ulang bila dukungan Synology berakhir.
