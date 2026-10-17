@@ -11,17 +11,18 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 ## Blocker Fase 0 — wajib ditutup sebelum Fase 1 diterima
 
 - [x] Catat perangkat target: Synology DS923+ dengan DSM 7.2.2.
-- [ ] Verifikasi langsung ketersediaan Web Station, PHP 7.4, MariaDB 10, serta ekstensi yang diperlukan pada DS923+.
-- [ ] Verifikasi paket server web, PHP 7.4, dan ekstensi yang dibutuhkan: PDO, PDO MySQL, cURL, dan OpenSSL.
+- [x] Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang pada NAS target; pemasangan paket belum diverifikasi secara independen.
+- [ ] Verifikasi versi/profil PHP aktif, koneksi aplikasi ke MariaDB di `127.0.0.1`, serta ekstensi yang diperlukan pada DS923+.
+- [ ] Verifikasi ekstensi PHP yang aktif: PDO, PDO MySQL, cURL, dan OpenSSL.
 - [ ] Sediakan wizard pemasangan browser tanpa CLI pada sisi pengguna.
-- [ ] Uji wizard membuat database/tabel dan akun database aplikasi dengan kredensial MariaDB berizin; jangan simpan kredensial administratif.
+- [ ] Periksa melalui phpMyAdmin apakah database dan akun aplikasi yang dibutuhkan sudah ada; uji koneksi Web Monitor ke `127.0.0.1`. Jika belum siap, uji wizard membuat database/tabel dan akun database aplikasi dengan kredensial berizin; jangan simpan kredensial administratif.
 - [ ] Uji wizard membuat administrator aplikasi pertama dan menutup installer setelah selesai.
 - [ ] Jalankan panduan pemasangan dari kondisi bersih pada lingkungan target atau lingkungan setara yang didokumentasikan.
 - [x] CI memeriksa sintaks PHP 7.4 dan penerapan skema pada MySQL 8.0.
 - [ ] Pastikan CI terbaru yang relevan selesai sukses setelah perubahan kode terkait.
 - [ ] Tinjau konfigurasi dan repositori untuk memastikan tidak ada rahasia yang ikut ter-commit.
 
-**Bukti yang tersedia:** CI pada commit `6de7075` berhasil. Ini hanya membuktikan pemeriksaan otomatis yang ada; bukan bukti instalasi Synology atau kompatibilitas runtime di perangkat target.
+**Bukti yang tersedia:** CI pada commit `6de7075` berhasil. Pengguna mengonfirmasi Web Station, MariaDB, dan PHP 7.4 sudah dipasang serta database sudah diatur melalui phpMyAdmin pada `127.0.0.1`. Ini belum membuktikan ekstensi PHP aktif atau Web Monitor berhasil tersambung ke database.
 
 **Gate Fase 0 terbuka jika:** semua kotak di atas ditutup dengan bukti yang dapat diperiksa, wizard instalasi GUI tanpa CLI berhasil membuat database dan akun pertama dengan hak minimum, panduan instalasi berhasil diikuti, dan hasil dicatat di log kerja. Setelah itu Fase 0 dapat diterima dan rilis 0.1.0 boleh dipertimbangkan.
 
