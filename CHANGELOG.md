@@ -1,18 +1,14 @@
 # Catatan Perubahan
 
-Semua perubahan penting dicatat di sini. Format mengikuti [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) dan penomoran versi mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Mengikuti Keep a Changelog dan Semantic Versioning.
 
 ## [Belum dirilis]
 
-### Ditambahkan
-- README dan roadmap awal aplikasi pemantau situs.
-- Glosarium istilah serta panduan kontribusi.
-- Kerangka dasbor baca-saja untuk PHP 7.4.
-- Skema awal basis data untuk situs pantauan dan riwayat pemeriksaan.
-- Contoh pengaturan lokal dan aturan pengabaian berkas rahasia.
+### Diubah
+- Roadmap TODO.md kini menetapkan target versi MINOR per fase dari 0.1.0 sampai 0.6.0 serta kriteria penerimaan.
 
 ### Keamanan
-- Dasbor belum memiliki autentikasi; jangan dipublikasikan ke internet sebelum kontrol akses diterapkan.
+- Dasbor belum memiliki autentikasi; jangan dipublikasikan ke internet.
 - PHP 7.4 tidak lagi mendapat dukungan keamanan resmi.
 
-Catatan: belum ada rilis resmi. Kerangka aplikasi belum diuji pada runtime PHP.
+Belum ada rilis resmi dan kerangka belum diuji pada runtime PHP.
