@@ -22,7 +22,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 - Tombol tindakan tiap situs disederhanakan menjadi ikon SVG inline dengan label aksesibel, tooltip, dan tanpa dependensi eksternal.
 - Tombol tambah situs ditempatkan di sisi kanan judul daftar situs dengan warna hijau; tombol keluar dipindahkan ke bagian bawah halaman dan diberi warna merah.
 - Mode target lokal menerima hostname intranet/Active Directory dan IP privat/loopback tanpa mensyaratkan resolusi DNS publik pada saat penyimpanan.
-- Opsi konfigurasi eksplisit dapat mengizinkan target intranet; secara bawaan nonaktif.
+- Pengaturan global izin alamat lokal dihapus; target intranet diatur per situs melalui checkbox `Situs lokal`.
 - Roadmap TODO.md menetapkan target versi MINOR per fase dari 0.1.0 sampai 0.6.0 serta kriteria penerimaan.
 - PHP 7.4 dipertahankan sebagai target runtime selama lingkungan Synology yang dituju masih mendukungnya; migrasi ditinjau kembali jika dukungan Synology berakhir.
 
