@@ -10,8 +10,12 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 
 ## Blocker Fase 0 — wajib ditutup sebelum Fase 1 diterima
 
-- [ ] Catat model perangkat dan versi DSM Synology target.
+- [x] Catat versi DSM target: DSM 7.2.2.
+- [ ] Catat model perangkat Synology dan pastikan paket yang dibutuhkan tersedia pada model tersebut.
 - [ ] Verifikasi paket server web, PHP 7.4, dan ekstensi yang dibutuhkan: PDO, PDO MySQL, cURL, dan OpenSSL.
+- [ ] Sediakan wizard pemasangan browser tanpa CLI pada sisi pengguna.
+- [ ] Uji wizard membuat database/tabel dan akun database aplikasi dengan kredensial MariaDB berizin; jangan simpan kredensial administratif.
+- [ ] Uji wizard membuat administrator aplikasi pertama dan menutup installer setelah selesai.
 - [ ] Jalankan panduan pemasangan dari kondisi bersih pada lingkungan target atau lingkungan setara yang didokumentasikan.
 - [x] CI memeriksa sintaks PHP 7.4 dan penerapan skema pada MySQL 8.0.
 - [ ] Pastikan CI terbaru yang relevan selesai sukses setelah perubahan kode terkait.
@@ -19,7 +23,17 @@ Sebagian implementasi Fase 1 sudah ada di `main`, tetapi itu belum berarti proye
 
 **Bukti yang tersedia:** CI pada commit `6de7075` berhasil. Ini hanya membuktikan pemeriksaan otomatis yang ada; bukan bukti instalasi Synology atau kompatibilitas runtime di perangkat target.
 
-**Gate Fase 0 terbuka jika:** semua kotak di atas ditutup dengan bukti yang dapat diperiksa, panduan instalasi berhasil diikuti, dan hasil dicatat di log kerja. Setelah itu Fase 0 dapat diterima dan rilis 0.1.0 boleh dipertimbangkan.
+**Gate Fase 0 terbuka jika:** semua kotak di atas ditutup dengan bukti yang dapat diperiksa, wizard instalasi GUI tanpa CLI berhasil membuat database dan akun pertama dengan hak minimum, panduan instalasi berhasil diikuti, dan hasil dicatat di log kerja. Setelah itu Fase 0 dapat diterima dan rilis 0.1.0 boleh dipertimbangkan.
+
+## Persyaratan rancangan installer DSM 7.2.2
+
+- Pengguna tidak perlu SSH, terminal, atau CLI untuk memasang dan mengatur aplikasi.
+- Installer berjalan sebagai wizard web, tetapi hanya aktif saat instalasi awal dan hanya melalui akses lokal/tepercaya.
+- Pembuatan database otomatis membutuhkan kredensial MariaDB yang memiliki hak membuat database dan akun/grant. Kredensial administratif tidak boleh disimpan; buat akun database khusus aplikasi dengan hak minimum.
+- Jika hak tidak cukup, installer harus berhenti dengan instruksi GUI yang jelas, bukan meminta pengguna menaikkan hak secara permanen atau mencoba bypass.
+- Administrator aplikasi dibuat melalui formulir pertama kali setelah database siap; kata sandi disimpan sebagai hash; setup dikunci setelah berhasil.
+- File konfigurasi berisi kredensial database aplikasi harus dilindungi, tidak berada di Git, tidak dapat diunduh, dan tidak ditampilkan dalam halaman diagnostik.
+- Pengaturan ekstensi PHP dilakukan lewat Web Station GUI. Dokumentasi resmi Synology untuk DSM 7.2 menyebut PHP 7.4 sebagai backend yang didukung, tetapi ketersediaan aktual harus dikonfirmasi pada model NAS target. Referensi: https://www.synology.com/en-au/dsm/7.2/software_spec/web_station dan https://kb.synology.com/en-global/DSM/help/WebStation/application_webserv_php.
 
 ## Gate Fase 1 — sebelum Fase 2
 
