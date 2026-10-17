@@ -38,14 +38,13 @@ jobs:
           release_date="$(printf '%s' "$heading" | sed -E 's/^## \[[^]]+\] - ([0-9]{4}-[0-9]{2}-[0-9]{2})$/\1/')"
           tag="v$version"
 
-          # Pastikan tanggal nyata dan versi/tag tidak kosong.
+          # Pastikan tanggal dapat diparse dan bagian catatan tidak kosong.
           date -d "$release_date" '+%Y-%m-%d' >/dev/null
           if [[ "$tag" == "v" ]]; then
             echo "Versi tidak valid." >&2
             exit 1
           fi
 
-          # Ambil isi bagian versi sampai heading level 2 berikutnya.
           awk -v heading="$heading" '
             $0 == heading { capture=1; next }
             /^## / && capture { exit }
@@ -59,7 +58,6 @@ jobs:
 
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "release_date=$release_date" >> "$GITHUB_OUTPUT"
           echo "should_release=true" >> "$GITHUB_OUTPUT"
 
       - name: Lewati jika tag sudah ada
@@ -85,4 +83,4 @@ jobs:
           body_path: release-notes.md
           target_commitish: ${{ github.sha }}
           draft: false
-          prerelease: ${{ startsWith(steps.catatan.outputs.version, '0.') && steps.catatan.outputs.version == '0.0.0' }}
+          prerelease: false
