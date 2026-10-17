@@ -1,5 +1,6 @@
 # Konfigurasi dan rahasia lokal
 config.php
+pengaturan.php
 .env
 
 # Log dan cadangan
