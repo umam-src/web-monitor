@@ -22,7 +22,7 @@ Setiap fase yang selesai menjadi rilis MINOR selama versi utama masih 0.x. Rilis
 - [x] Tambahkan CI untuk pemeriksaan sintaks PHP 7.4 dan penerapan skema MySQL.
 - [x] Tambahkan uji penerapan skema pada MySQL 8.0 di CI.
 
-Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. Run CI yang tercatat pada 2026-10-17 berhasil untuk versi sebelum implementasi Fase 1; perubahan Fase 1 harus diverifikasi oleh run baru.
+Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan sintaks, skema bisa diterapkan pada basis data kosong, dan rahasia tidak masuk Git. Run CI pada commit sebelumnya berhasil; implementasi Fase 1 masih menunggu CI baru. Run CI yang tercatat pada 2026-10-17 berhasil untuk versi sebelum implementasi Fase 1; perubahan Fase 1 harus diverifikasi oleh run baru.
 
 ## Fase 1 — Pengelolaan situs dan pemeriksaan manual (target 0.2.0)
 - [x] Implementasikan tambah, ubah, aktifkan/nonaktifkan, dan hapus situs.
@@ -33,6 +33,8 @@ Kriteria penerimaan: instalasi dapat diulang, semua berkas PHP lulus pemeriksaan
 - [ ] Uji respons sukses, 4xx/5xx, DNS gagal, batas waktu, dan TLS pada runtime PHP 7.4.
 
 Kriteria penerimaan: pengguna bisa mengelola situs dari antarmuka; pemeriksaan menyimpan hasil; kegagalan koneksi dibedakan dari kode HTTP; keluaran dan kueri ditangani dengan aman. Implementasi baru belum dianggap terverifikasi sampai CI dan uji runtime lulus.
+
+Implementasi Fase 1 belum dianggap terverifikasi sampai CI dan uji runtime lulus. Validasi URL merupakan mitigasi SSRF awal, belum menutup DNS rebinding; aplikasi jangan dipublikasikan.
 
 ## Fase 2 — Pemantauan terjadwal dan riwayat (target 0.3.0)
 - [ ] Jalankan pemeriksaan melalui cron dengan interval per situs.
