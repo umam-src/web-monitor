@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pengguna = trim(isset($_POST['pengguna']) && is_string($_POST['pengguna']) ? $_POST['pengguna'] : '');
         $rahasia = isset($_POST['rahasia']) && is_string($_POST['rahasia']) ? $_POST['rahasia'] : '';
         $admin = trim(isset($_POST['admin']) && is_string($_POST['admin']) ? $_POST['admin'] : '');
-        $passwordAdmin = isset($_POST['password_admin']) && is_string($_POST['password_admin']) ? $_POST['password_admin'] : '';
+        $passwordAdmin = isset($_POST['password_admin']) && is_string($_POST['password_admin']) ? $_POST['password_admin'] : '';\n        $izinkanLokal = isset($_POST['izinkan_alamat_lokal']) && $_POST['izinkan_alamat_lokal'] === '1';
         if (!preg_match('/^[a-zA-Z0-9_.-]{1,100}$/', $host)) {
             throw new InvalidArgumentException('Host tidak valid.');
         }
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute(array($admin, $hash));
 
         $konfigurasi = "<?php\n// Dibuat oleh wizard Web Monitor. Jangan masukkan ke Git.\nreturn " .
-            var_export(array('dsn' => $dsn, 'pengguna' => $pengguna, 'rahasia' => $rahasia), true) . ";\n";
+            var_export(array('dsn' => $dsn, 'pengguna' => $pengguna, 'rahasia' => $rahasia, 'izinkan_alamat_lokal' => $izinkanLokal), true) . ";\n";
         $sementara = $berkasPengaturan . '.tmp';
         if (file_put_contents($sementara, $konfigurasi, LOCK_EX) === false ||
             !@rename($sementara, $berkasPengaturan)) {
@@ -199,7 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <p class="muted">Akun harus memiliki hak membuat tabel dan hak baca/tulis pada database ini. Kata sandi ini hanya digunakan untuk setup dan koneksi aplikasi yang disimpan di konfigurasi terlindungi.</p>
 <h2>Administrator Web Monitor</h2>
 <label for="admin">Nama pengguna administrator</label><input id="admin" name="admin" minlength="3" maxlength="80" required>
-<label for="password_admin">Kata sandi administrator (minimal 12 karakter)</label><input id="password_admin" name="password_admin" type="password" minlength="12" autocomplete="new-password" required>
+<label for="password_admin">Kata sandi administrator (minimal 12 karakter)</label><input id="password_admin" name="password_admin" type="password" minlength="12" autocomplete="new-password" required>\n<label><input type="checkbox" name="izinkan_alamat_lokal" value="1" style="width:auto"> Izinkan target intranet, hostname lokal, dan IP privat</label>\n<p class="muted">Nonaktifkan untuk pemantauan publik biasa. Jika diaktifkan, Web Monitor dapat meminta alamat internal dari servernya; gunakan hanya pada jaringan tepercaya karena risiko SSRF meningkat.</p>
 <p><button type="submit">Uji koneksi dan instal otomatis</button></p>
 </form>
 <?php endif; ?>
