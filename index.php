@@ -101,7 +101,7 @@ if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && empty($_SESSION['pengguna_i
     }
 }
 
-if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_id'])) {
+if ($pdo && $_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SESSION['pengguna_id']) && (!isset($_POST['aksi']) || $_POST['aksi'] !== 'masuk')) {
     if (!tokenValid()) {
         http_response_code(400);
         $pesan = 'Permintaan tidak valid atau sesi kedaluwarsa. Muat ulang halaman.';
@@ -260,7 +260,7 @@ if ($pdo) {
 <label for="interval_detik">Interval pemeriksaan (detik, minimal 60)</label><input id="interval_detik" name="interval_detik" type="number" min="60" max="86400" required value="<?php echo aman($edit ? $edit['interval_detik'] : 300); ?>">
 <p><button type="submit">Simpan situs</button> <?php if ($edit): ?><a class="button" href="index.php">Batal</a><?php endif; ?></p>
 </form>
-<p class="muted">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Alamat IP privat/lokal ditolak. Aplikasi ini belum memiliki autentikasi; jangan publikasikan.</p>
+<p class="muted">Pemeriksaan manual memakai cURL, batas waktu koneksi 5 detik dan total 15 detik, tanpa mengikuti pengalihan. Alamat IP privat/lokal ditolak. Akses dashboard memerlukan login. Jangan publikasikan sebelum mitigasi SSRF dan audit keamanan selesai.</p>
 </section>
 <?php if ($riwayatSitus): ?>
 <section class="panel">
