@@ -8,6 +8,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 - Verifikasi runtime wizard setup dan login pada NAS Synology target; masih menunggu pengujian.
 
 ### Ditambahkan
+- Pemeriksaan mode publik menggunakan DNS-over-HTTPS Cloudflare dan mengunci koneksi cURL ke alamat IPv4 publik yang divalidasi, tanpa bergantung pada DNS internal untuk target.
 - Opsi `Situs lokal` per situs pada formulir tambah/ubah; nilainya disimpan di database dan kolom baru dimigrasikan otomatis pada instalasi lama.
 - Dialog tambah/ubah situs dengan ukuran berbasis viewport, batas minimum/maksimum, dan area isi yang dapat digulir.
 - Wizard browser `setup.php` menguji koneksi ke database yang sudah ada dan membuat tabel situs, riwayat, serta akun administrator secara otomatis tanpa phpMyAdmin.
@@ -17,6 +18,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 - Workflow CI pada push ke main dan pemicu manual untuk memeriksa sintaks PHP 7.4 serta penerapan skema pada MySQL 8.0.
 
 ### Diubah
+- Target publik dapat disimpan meskipun DNS sedang gagal agar gangguan DNS bisa dideteksi saat pemeriksaan; target publik di-resolve melalui DNS-over-HTTPS saat diperiksa.
 - Inisialisasi dialog tambah/ubah ditunda hingga DOM selesai diparsing agar tombol pemicu tersedia saat event handler dipasang.
 - Tombol Periksa semua ditempatkan di samping Tambah situs; pemeriksaan massal memeriksa seluruh situs aktif dan menyimpan hasil tiap situs.
 - Tombol tindakan tiap situs disederhanakan menjadi ikon SVG inline dengan label aksesibel, tooltip, dan tanpa dependensi eksternal.
