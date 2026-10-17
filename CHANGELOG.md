@@ -16,6 +16,7 @@ Mengikuti Keep a Changelog dan Semantic Versioning.
 - Workflow CI pada push ke main dan pemicu manual untuk memeriksa sintaks PHP 7.4 serta penerapan skema pada MySQL 8.0.
 
 ### Diubah
+- Tombol tambah situs ditempatkan di sisi kanan judul daftar situs dengan warna hijau; tombol keluar dipindahkan ke bagian bawah halaman dan diberi warna merah.
 - Mode target lokal menerima hostname intranet/Active Directory dan IP privat/loopback tanpa mensyaratkan resolusi DNS publik pada saat penyimpanan.
 - Opsi konfigurasi eksplisit dapat mengizinkan target intranet; secara bawaan nonaktif.
 - Roadmap TODO.md menetapkan target versi MINOR per fase dari 0.1.0 sampai 0.6.0 serta kriteria penerimaan.
