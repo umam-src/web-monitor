@@ -60,7 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pengguna = trim(isset($_POST['pengguna']) && is_string($_POST['pengguna']) ? $_POST['pengguna'] : '');
         $rahasia = isset($_POST['rahasia']) && is_string($_POST['rahasia']) ? $_POST['rahasia'] : '';
         $admin = trim(isset($_POST['admin']) && is_string($_POST['admin']) ? $_POST['admin'] : '');
-        $passwordAdmin = isset($_POST['password_admin']) && is_string($_POST['password_admin']) ? $_POST['password_admin'] : '';\n        $izinkanLokal = isset($_POST['izinkan_alamat_lokal']) && $_POST['izinkan_alamat_lokal'] === '1';
+        $passwordAdmin = isset($_POST['password_admin']) && is_string($_POST['password_admin']) ? $_POST['password_admin'] : '';
+        $izinkanLokal = isset($_POST['izinkan_alamat_lokal']) && $_POST['izinkan_alamat_lokal'] === '1';
         if (!preg_match('/^[a-zA-Z0-9_.-]{1,100}$/', $host)) {
             throw new InvalidArgumentException('Host tidak valid.');
         }
